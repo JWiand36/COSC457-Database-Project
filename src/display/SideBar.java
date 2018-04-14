@@ -1,26 +1,46 @@
 package display;
 
 
+import javafx.collections.FXCollections;
+import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
-import services.Controller;
+
+import services.Display;
+
+import java.util.ArrayList;
 
 public class SideBar {
 
     private HBox pane;
-    private Controller controller;
 
-    public SideBar(Controller controller){
+    private ListView<String> list_view;
+
+    public SideBar(Display display){
 
         this.pane = new HBox(5);
-        this.controller = controller;
 
+        list_view = new ListView<>();
 
-        this.pane.getChildren().add(new Text("Side"));
+        list_view.getSelectionModel().selectedItemProperty().addListener(e-> display.displayData(selectedData()));
+
+        this.pane.getChildren().addAll(new Text("Side"), list_view);
+    }
+
+    public void setInfo(ArrayList<String> list){
+        list_view.setItems(FXCollections.observableArrayList(list));
     }
 
     public Pane display(){
         return pane;
+    }
+
+    //Private Methods
+    private String selectedData(){
+        if(list_view.getSelectionModel().getSelectedIndex() != -1)
+            return list_view.getItems().get(list_view.getSelectionModel().getSelectedIndex());
+        else
+            return list_view.getItems().get(0);
     }
 }

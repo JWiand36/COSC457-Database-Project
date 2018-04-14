@@ -3,20 +3,35 @@ package display;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
-import services.Controller;
+
+import services.Display;
+import structures.Receipt;
+
 
 public class Sale implements DisplayInterface{
 
     private GridPane pane;
-    private Controller controller;
+    private Display display;
 
-    public Sale(Controller controller){
+    private Text customer = new Text("Sale");
+    private Text employee = new Text("Sale");
 
-        this.controller = controller;
+
+    public Sale(Display display){
+
+        this.display = display;
 
         pane = new GridPane();
-        this.pane.add(new Text("Sale"),0,0);
+        this.pane.add(customer,0,0);
+        this.pane.add(employee,0,1);
 
+
+
+    }
+
+    public void displayOne(Receipt receipt){
+        this.employee.setText(receipt.getEmployee_name());
+        this.customer.setText(receipt.getCustomer_name());
     }
 
     public Pane display(){

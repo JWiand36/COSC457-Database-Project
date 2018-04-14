@@ -3,6 +3,8 @@ package services;
 import display.*;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import structures.DataInterface;
+import structures.Receipt;
 
 public class Display {
 
@@ -14,6 +16,13 @@ public class Display {
     private Sale sale;
     private SideBar side;
     private Controller controller;
+
+    private int location = 0;
+
+    static final int CUSTOMERS = 1;
+    static final int SALES = 2;
+    static final int INVENTORY = 3;
+    static final int EMPLOYEE = 4;
 
     public Display(BorderPane main){
         this.main = main;
@@ -28,8 +37,8 @@ public class Display {
         this.employee = new Employee(controller);
         this.inventory = new Inventory(controller);
         this.nav = new Navigation(this);
-        this.sale = new Sale(controller);
-        this.side = new SideBar(controller);
+        this.sale = new Sale(this);
+        this.side = new SideBar(this);
 
         main.setCenter(login.display());
     }
@@ -40,17 +49,21 @@ public class Display {
 
     //Public Methods
     public void displayNav(){
+        side.setInfo(controller.getData(SALES));
+
+        this.location = SALES;
+
         main.setTop(nav.displayNav(controller.isManager()));
         main.setCenter(sale.display());
+        main.setRight(side.display());
     }
 
-    public void display(DisplayInterface dis, boolean sideNeeded){
-        main.setCenter(dis.display());
+    public void display(DisplayInterface dis, int n){
+        side.setInfo(controller.getData(n));
 
-        if(sideNeeded)
-            main.setRight(this.side.display());
-        else
-            main.setRight(null);
+        this.location = n;
+
+        main.setCenter(dis.display());
     }
 
     public Label makeMenuItem(String text){
@@ -59,20 +72,36 @@ public class Display {
 
         switch (text){
             case "Customer":
-                item.setOnMouseClicked(e-> this.display(customer, true));
+                item.setOnMouseClicked(e-> this.display(customer, CUSTOMERS));
                 break;
             case "Sales":
-                item.setOnMouseClicked(e-> this.display(sale, false));
+                item.setOnMouseClicked(e-> this.display(sale, SALES));
                 break;
             case "Inventory":
-                item.setOnMouseClicked(e-> this.display(inventory, true));
+                item.setOnMouseClicked(e-> this.display(inventory, INVENTORY));
                 break;
             case "Employee":
-                item.setOnMouseClicked(e-> this.display(employee, true));
+                item.setOnMouseClicked(e-> this.display(employee, EMPLOYEE));
                 break;
         }
 
         return item;
+    }
+
+    public void displayData(String data){
+
+        DataInterface obj = controller.getOne(data, location);
+
+        if(location == CUSTOMERS){
+
+        }else if(location == SALES){
+            sale.displayOne((Receipt) obj);
+        }else if(location == INVENTORY){
+
+        }else if(location == EMPLOYEE){
+
+        }
+
     }
 
     //Private Methods

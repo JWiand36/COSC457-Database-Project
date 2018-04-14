@@ -1,5 +1,9 @@
 package services;
 
+import structures.DataInterface;
+
+import java.util.ArrayList;
+
 public class Controller {
 
     private Storage storage;
@@ -16,8 +20,16 @@ public class Controller {
         return storage.isManager();
     }
 
+    ArrayList<String> getData(int n){
+        return storage.getData(n);
+    }
+
     public boolean isEmployee(String user, String pass){
         return true;
+    }
+
+    DataInterface getOne(String data, int location){
+        return storage.getOne(data, location);
     }
 
     private void initDisplay(){
