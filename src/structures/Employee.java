@@ -3,28 +3,28 @@ package structures;
 public class Employee implements DataInterface{
 
     private int ssn;
-    private int super_ssn;
+    private String super_name;
     private String first_name;
     private String last_name;
     private String address;
     private String sex;
+    private String store;
     private int age;
-    private int store;
 
     public Employee(){
         this.ssn = 0;
-        this.super_ssn = 0;
+        this.super_name = "";
         this.first_name = "";
         this.last_name = "";
         this.address = "";
         this.sex = "";
+        this.store = "";
         this.age = 0;
-        this.store = 0;
     }
 
-    public Employee(int ssn, int super_ssn, String first_name, String last_name, String address, String sex, int age, int store) {
+    public Employee(int ssn, String super_name, String first_name, String last_name, String address, String sex, int age, String store) {
         this.ssn = ssn;
-        this.super_ssn = super_ssn;
+        this.super_name = super_name;
         this.first_name = first_name;
         this.last_name = last_name;
         this.address = address;
@@ -33,20 +33,16 @@ public class Employee implements DataInterface{
         this.store = store;
     }
 
-    public int getSsn() {
-        return ssn;
-    }
-
     public void setSsn(int ssn) {
         this.ssn = ssn;
     }
 
-    public int getSuper_ssn() {
-        return super_ssn;
+    public String getSuper_Name() {
+        return super_name;
     }
 
-    public void setSuper_ssn(int super_ssn) {
-        this.super_ssn = super_ssn;
+    public void setSuper_name(String super_name) {
+        this.super_name = super_name;
     }
 
     public String getFirst_name() {
@@ -89,11 +85,11 @@ public class Employee implements DataInterface{
         this.age = age;
     }
 
-    public int getStore() {
+    public String getStore() {
         return store;
     }
 
-    public void setStore(int store) {
+    public void setStore(String store) {
         this.store = store;
     }
 }

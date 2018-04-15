@@ -22,6 +22,18 @@ public class Receipt implements DataInterface{
         this.date = new Date();
     }
 
+    public Receipt(String customer_name, String employee_name, String store_location, Product[] products, Date date) {
+        this.customer_name = customer_name;
+        this.employee_name = employee_name;
+        this.store_location = store_location;
+
+        for(Product product: products)
+            this.total_balance += product.getPrice();
+
+        this.products = products;
+        this.date = date;
+    }
+
     public Receipt(int id, String customer_name, String employee_name, String store_location, double total_balance, Product[] products, Date date){
         this.id = id;
         this.customer_name = customer_name;

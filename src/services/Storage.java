@@ -3,11 +3,11 @@ package services;
 import structures.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import static services.Display.*;
 
 public class Storage {
-
 
     ArrayList<String> getData(int n){
 
@@ -22,8 +22,8 @@ public class Storage {
             result.add("2");
 
         }else if(n == INVENTORY){
-            result.add("Paper");
-            result.add("Books");
+            result.add("Construction Paper");
+            result.add("Kill a Mocking Bird");
         }else if(n == EMPLOYEE){
             result.add("John");
             result.add("Stacy");
@@ -69,13 +69,8 @@ public class Storage {
 
         ArrayList<Customer> list = new ArrayList<>();
 
-        list.add(new Customer());
-        list.add(new Customer());
-
-        list.get(0).setFirst_name("Ryan");
-        list.get(0).setLast_name("Corn");
-        list.get(1).setFirst_name("Lindsy");
-        list.get(1).setLast_name("Davis");
+        list.add(new Customer("Ryan", "Corn", "Towson", "Male"));
+        list.add(new Customer("Lindsy", "Davis", "Washington DC", "Female"));
 
         for(Customer customer: list){
             if(data.equals(customer.getFirst_name()))
@@ -89,16 +84,20 @@ public class Storage {
 
         ArrayList<Receipt> list = new ArrayList<>();
 
-        list.add(new Receipt());
-        list.add(new Receipt());
+        Product p1 = new Product("Product 1", "", 0, 5.0);
+        Product p2 = new Product("Product 2", "", 0, 4.0);
+        Product p3 = new Product("Product 3", "", 0, 3.0);
+        Product p4 = new Product("Product 4", "", 0, 2.0);
+        Product p5 = new Product("Product 5", "", 0, 1.0);
+
+        Product[] products1 = {p1,p3,p5};
+        Product[] products2 = {p2,p4,p1};
+
+        list.add(new Receipt("Nick", "Cindy", "Frederick", products1, new Date()));
+        list.add(new Receipt("Jessica", "Brad", "Towson", products2, new Date()));
 
         list.get(0).setId(1);
-        list.get(0).setCustomer_name("Nick");
-        list.get(0).setEmployee_name("Cindy");
-
         list.get(1).setId(2);
-        list.get(1).setCustomer_name("Jessica");
-        list.get(1).setEmployee_name("Brad");
 
         for(Receipt receipt: list){
             if(data.equals(receipt.getId()+""))
@@ -112,11 +111,8 @@ public class Storage {
 
         ArrayList<Product> list = new ArrayList<>();
 
-        list.add(new Product());
-        list.add(new Product());
-
-        list.get(0).setName("Paper");
-        list.get(1).setName("Books");
+        list.add(new Product("Construction Paper", "Paper", 30, 3.50));
+        list.add(new Product("Kill a Mocking Bird", "Book", 10, 5.00));
 
         for(Product product: list){
             if(data.equals(product.getName()))
@@ -130,14 +126,8 @@ public class Storage {
 
         ArrayList<Employee> list = new ArrayList<>();
 
-        list.add(new Employee());
-        list.add(new Employee());
-
-        list.get(0).setFirst_name("John");
-        list.get(0).setLast_name("Doe");
-
-        list.get(1).setFirst_name("Stacy");
-        list.get(1).setLast_name("Smith");
+        list.add(new Employee(0, "Stacy Smith", "John", "Doe", "Frederick", "Male", 35, "Frederick"));
+        list.add(new Employee(1, "", "Stacy", "Smith", "Walkersville", "Female", 40, "Frederick"));
 
         for(Employee employee: list){
             if(data.equals(employee.getFirst_name()))
