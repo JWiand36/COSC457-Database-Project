@@ -5,7 +5,6 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.text.Text;
 
 import services.Display;
 
@@ -25,7 +24,7 @@ public class SideBar {
 
         list_view.getSelectionModel().selectedItemProperty().addListener(e-> display.displayData(selectedData()));
 
-        this.pane.getChildren().addAll(new Text("Side"), list_view);
+        pane.getChildren().add(list_view);
     }
 
     public void setInfo(ArrayList<String> list){

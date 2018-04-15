@@ -1,5 +1,6 @@
 package display;
 
+import display.main.DisplayInterface;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -9,7 +10,7 @@ import javafx.scene.text.Text;
 import services.Controller;
 import services.Display;
 
-public class Login implements DisplayInterface{
+public class Login implements DisplayInterface {
 
     private FlowPane flow;
     private Controller controller;
@@ -24,13 +25,11 @@ public class Login implements DisplayInterface{
         initLogin();
     }
 
-    //Public Methods
     @Override
     public Pane display(){
         return flow;
     }
 
-    //Private Methods
     private void initLogin(){
         Label user = new Label("UserName");
         TextField field = new TextField("Type something here");

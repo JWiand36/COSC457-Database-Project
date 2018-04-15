@@ -14,26 +14,22 @@ public class Storage {
         ArrayList<String> result = new ArrayList<>();
 
         if(n == CUSTOMERS){
-            result.add("customer 1");
-            result.add("customer 2");
+            result.add("Ryan");
+            result.add("Lindsy");
         }else if(n == SALES){
 
             result.add("1");
             result.add("2");
 
         }else if(n == INVENTORY){
-            result.add("Product 1");
-            result.add("Product 2");
+            result.add("Paper");
+            result.add("Books");
         }else if(n == EMPLOYEE){
-            result.add("Employee 1");
-            result.add("Employee 2");
+            result.add("John");
+            result.add("Stacy");
         }
 
         return result;
-    }
-
-    boolean isManager(){
-        return true;
     }
 
     DataInterface getOne(String data, int location){
@@ -50,6 +46,25 @@ public class Storage {
             return null;
     }
 
+    boolean isManager(){
+        return true;
+    }
+
+    boolean isEmployee() { return true; }
+
+    void addData(DataInterface data, int current_pane){
+
+        if(current_pane == CUSTOMERS){
+            addCustomer((Customer) data);
+        }else if(current_pane == SALES){
+            addSale((Receipt) data);
+        }else if(current_pane == INVENTORY){
+            addProduct((Product) data);
+        }else if(current_pane == EMPLOYEE){
+            addEmployee((Employee) data);
+        }
+    }
+
     private DataInterface getCustomer(String data){
 
         ArrayList<Customer> list = new ArrayList<>();
@@ -57,8 +72,10 @@ public class Storage {
         list.add(new Customer());
         list.add(new Customer());
 
-        list.get(0).setFirst_name("Customer 1");
-        list.get(1).setFirst_name("Customer 2");
+        list.get(0).setFirst_name("Ryan");
+        list.get(0).setLast_name("Corn");
+        list.get(1).setFirst_name("Lindsy");
+        list.get(1).setLast_name("Davis");
 
         for(Customer customer: list){
             if(data.equals(customer.getFirst_name()))
@@ -76,12 +93,12 @@ public class Storage {
         list.add(new Receipt());
 
         list.get(0).setId(1);
-        list.get(0).setCustomer_name("Customer 1");
-        list.get(0).setEmployee_name("Employee 1");
+        list.get(0).setCustomer_name("Nick");
+        list.get(0).setEmployee_name("Cindy");
 
         list.get(1).setId(2);
-        list.get(1).setCustomer_name("Customer 2");
-        list.get(1).setEmployee_name("Employee 2");
+        list.get(1).setCustomer_name("Jessica");
+        list.get(1).setEmployee_name("Brad");
 
         for(Receipt receipt: list){
             if(data.equals(receipt.getId()+""))
@@ -98,8 +115,8 @@ public class Storage {
         list.add(new Product());
         list.add(new Product());
 
-        list.get(0).setName("Product 1");
-        list.get(1).setName("Product 2");
+        list.get(0).setName("Paper");
+        list.get(1).setName("Books");
 
         for(Product product: list){
             if(data.equals(product.getName()))
@@ -116,8 +133,11 @@ public class Storage {
         list.add(new Employee());
         list.add(new Employee());
 
-        list.get(0).setFirst_name("Customer 1");
-        list.get(1).setFirst_name("Customer 2");
+        list.get(0).setFirst_name("John");
+        list.get(0).setLast_name("Doe");
+
+        list.get(1).setFirst_name("Stacy");
+        list.get(1).setLast_name("Smith");
 
         for(Employee employee: list){
             if(data.equals(employee.getFirst_name()))
@@ -125,5 +145,21 @@ public class Storage {
         }
 
         return new Employee();
+    }
+
+    private void addCustomer(Customer customer){
+
+    }
+
+    private void addSale(Receipt sale){
+
+    }
+
+    private void addProduct(Product product){
+
+    }
+
+    private void addEmployee(Employee employee){
+
     }
 }

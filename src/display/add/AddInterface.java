@@ -1,7 +1,8 @@
-package display;
+package display.add;
 
 import javafx.scene.layout.Pane;
 
-public interface DisplayInterface {
+public interface AddInterface {
+
     Pane display();
 }

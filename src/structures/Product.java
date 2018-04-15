@@ -52,4 +52,8 @@ public class Product implements DataInterface{
     public void setPrice(double price) {
         this.price = price;
     }
+
+    public String toString(){
+        return this.name + ": $" + this.price;
+    }
 }

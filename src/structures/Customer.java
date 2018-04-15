@@ -27,6 +27,14 @@ public class Customer implements DataInterface{
         this.balance = Double.parseDouble(balance);
     }
 
+    public Customer(String first_name, String last_name, String address, String sex) {
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.address = address;
+        this.sex = sex;
+        this.balance = 0;
+    }
+
     public int getId() {
         return id;
     }
