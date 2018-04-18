@@ -44,6 +44,7 @@ public class Display {
     public static final int SALES = 2;
     public static final int INVENTORY = 3;
     public static final int EMPLOYEE = 4;
+    public static final int ADD_SALE = 5;
 
     public Display(BorderPane main){
         this.main = main;
@@ -83,19 +84,22 @@ public class Display {
         main.setTop(nav.displayNav(controller.isManager()));
         main.setCenter(sale.display());
         main.setRight(side.display());
-        main.setBottom(add_sale.display());
 
     }
 
     //General method used to display the main pain and the add pane. The integer is to hold the current pane
     //for data transfer.
-    public void display(DisplayInterface dis, AddInterface add, int n){
+    public void display(DisplayInterface dis, DisplayInterface add, int n){
         side.setInfo(controller.getData(n));
 
         this.current_pane = n;
 
         main.setCenter(dis.display());
-        main.setBottom(add.display());
+
+        if(add != null)
+            main.setBottom(add.display());
+        else
+            main.setBottom(null);
     }
 
     //This method is used create the menu items at the top. Allowing users to navigate through the program.
@@ -107,14 +111,17 @@ public class Display {
             case "Customer":
                 item.setOnMouseClicked(e-> this.display(customer, add_customer, CUSTOMERS));
                 break;
-            case "Sales":
-                item.setOnMouseClicked(e-> this.display(sale, add_sale, SALES));
+            case "Previous Sales":
+                item.setOnMouseClicked(e-> this.display(sale, null, SALES));
                 break;
             case "Inventory":
                 item.setOnMouseClicked(e-> this.display(inventory, add_product, INVENTORY));
                 break;
             case "Employee":
                 item.setOnMouseClicked(e-> this.display(employee, add_employee, EMPLOYEE));
+                break;
+            case "New Sale":
+                item.setOnMouseClicked(e-> this.display(add_sale, null, ADD_SALE));
                 break;
         }
 
@@ -129,12 +136,17 @@ public class Display {
 
         if(current_pane == CUSTOMERS){
             customer.displayOne((structures.Customer) obj);
+            add_customer.displayOne((structures.Customer) obj);
         }else if(current_pane == SALES){
             sale.displayOne((Receipt) obj);
         }else if(current_pane == INVENTORY){
             inventory.displayOne((Product) obj);
+            add_product.displayOne((Product) obj);
         }else if(current_pane == EMPLOYEE){
             employee.displayOne((structures.Employee) obj);
+            add_employee.displayOne((structures.Employee) obj);
+        }else if(current_pane == ADD_SALE){
+            add_sale.displayOne((structures.Product) obj);
         }
 
     }

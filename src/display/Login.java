@@ -32,22 +32,24 @@ public class Login implements DisplayInterface {
 
     private void initLogin(){
         Label user = new Label("UserName");
-        TextField field = new TextField("Type something here");
+        TextField user_field = new TextField("Type something here");
         Label pass = new Label("Password");
         TextField pass_field = new TextField("Type something here");
         Button button = new Button("Login");
-        Text err = new Text("Your password or login information is incorrect.");
+        Text err = new Text();
+
 
         button.setOnAction( e ->{
-            System.out.println(field.getText());
-            if(controller.isEmployee(user.getText(), pass.getText())){
+            if(controller.isEmployee(user_field.getText(), pass_field.getText())){
                 display.displayNav();
             }else{
-                flow.getChildren().add(err);
+                err.setText("Your password or login information is incorrect.");
             }
         });
 
-        flow.getChildren().addAll(user, field, pass, pass_field, button);
+        flow.getChildren().addAll(user, user_field, pass, pass_field, button);
+
+        flow.getChildren().add(err);
     }
 
 }

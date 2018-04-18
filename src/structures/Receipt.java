@@ -1,6 +1,6 @@
 package structures;
 
-import java.util.Date;
+import java.util.ArrayList;
 
 public class Receipt implements DataInterface{
 
@@ -9,8 +9,8 @@ public class Receipt implements DataInterface{
     private String employee_name;
     private String store_location;
     private double total_balance;
-    private Product[] products;
-    private Date date;
+    private ArrayList<Product> products;
+    private String date;
 
     public Receipt(){
         this.id = 0;
@@ -18,11 +18,11 @@ public class Receipt implements DataInterface{
         this.employee_name = "";
         this.store_location = "";
         this.total_balance = 0;
-        this.products = new Product[0];
-        this.date = new Date();
+        this.products = new ArrayList<>();
+        this.date = "";
     }
 
-    public Receipt(String customer_name, String employee_name, String store_location, Product[] products, Date date) {
+    public Receipt(String customer_name, String employee_name, String store_location, ArrayList<Product> products, String date) {
         this.customer_name = customer_name;
         this.employee_name = employee_name;
         this.store_location = store_location;
@@ -34,7 +34,7 @@ public class Receipt implements DataInterface{
         this.date = date;
     }
 
-    public Receipt(int id, String customer_name, String employee_name, String store_location, double total_balance, Product[] products, Date date){
+    public Receipt(int id, String customer_name, String employee_name, String store_location, double total_balance, ArrayList<Product> products, String date){
         this.id = id;
         this.customer_name = customer_name;
         this.employee_name = employee_name;
@@ -56,47 +56,23 @@ public class Receipt implements DataInterface{
         return customer_name;
     }
 
-    public void setCustomer_name(String customer_name) {
-        this.customer_name = customer_name;
-    }
-
     public String getEmployee_name() {
         return employee_name;
-    }
-
-    public void setEmployee_name(String employee_name) {
-        this.employee_name = employee_name;
     }
 
     public String getStore_location() {
         return store_location;
     }
 
-    public void setStore_location(String store_location) {
-        this.store_location = store_location;
-    }
-
     public double getTotal_balance() {
         return total_balance;
     }
 
-    public void setTotal_balance(double total_balance) {
-        this.total_balance = total_balance;
-    }
-
-    public Product[] getProducts() {
+    public ArrayList<Product> getProducts() {
         return products;
     }
 
-    public void setProducts(Product[] products) {
-        this.products = products;
-    }
-
-    public Date getDate() {
+    public String getDate() {
         return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
     }
 }

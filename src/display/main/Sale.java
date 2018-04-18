@@ -44,7 +44,7 @@ public class Sale implements DisplayInterface {
         String temp = "";
 
         this.location.setText(receipt.getStore_location());
-        this.date.setText(receipt.getDate()+"");
+        this.date.setText(receipt.getDate());
         this.employee.setText(receipt.getEmployee_name());
         this.customer.setText(receipt.getCustomer_name());
 

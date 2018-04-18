@@ -1,5 +1,6 @@
 package display.add;
 
+import display.main.DisplayInterface;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -10,19 +11,20 @@ import services.Controller;
 import services.Display;
 import structures.Customer;
 
-public class AddCustomer implements AddInterface{
+public class AddCustomer implements DisplayInterface{
 
     private GridPane pane;
+
+    private TextField first_name = new TextField();
+    private TextField last_name = new TextField();
+    private TextField address = new TextField();
 
     public AddCustomer(Controller controller){
 
         this.pane = new GridPane();
-
-        TextField first_name = new TextField();
-        TextField last_name = new TextField();
-        TextField address = new TextField();
         ComboBox<String> sex = new ComboBox<>();
         Button submit = new Button("Submit");
+        Button edit = new Button("Edit");
 
         sex.getItems().addAll("Male", "Female");
 
@@ -35,19 +37,32 @@ public class AddCustomer implements AddInterface{
         pane.add(address,1,1);
         pane.add(sex,3,1);
 
-        pane.add(submit, 0 , 2);
+        pane.add(submit, 2,2);
+        pane.add(edit, 1, 2);
 
         submit.setOnAction(e->{
-            System.out.println(sex.getValue());
             Customer customer = new Customer(first_name.getText(), last_name.getText(),
                     address.getText(), sex.getSelectionModel().getSelectedItem());
 
             controller.addData(customer, Display.CUSTOMERS);
+        });
+
+        edit.setOnAction(e->{
+            Customer customer = new Customer(first_name.getText(), last_name.getText(),
+                    address.getText(), sex.getSelectionModel().getSelectedItem());
+
+            controller.editData(customer, Display.CUSTOMERS);
         });
     }
 
     @Override
     public Pane display(){
         return pane;
+    }
+
+    public void displayOne(Customer customer){
+        this.first_name.setText(customer.getFirst_name());
+        this.last_name.setText(customer.getLast_name());
+        this.address.setText(customer.getAddress());
     }
 }

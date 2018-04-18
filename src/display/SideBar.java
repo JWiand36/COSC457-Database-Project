@@ -22,7 +22,10 @@ public class SideBar {
 
         list_view = new ListView<>();
 
-        list_view.getSelectionModel().selectedItemProperty().addListener(e-> display.displayData(selectedData()));
+        list_view.setOnMouseClicked(e-> {
+            if(e.getClickCount() == 1)
+                display.displayData(selectedData());
+        });
 
         pane.getChildren().add(list_view);
     }

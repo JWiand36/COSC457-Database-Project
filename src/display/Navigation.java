@@ -16,9 +16,10 @@ public class Navigation {
 
     private void initNavigation(){
         Menu customer = new Menu("",display.makeMenuItem("Customer"));
-        Menu sale = new Menu("", display.makeMenuItem("Sales"));
+        Menu sale = new Menu("", display.makeMenuItem("Previous Sales"));
+        Menu new_sales = new Menu("", display.makeMenuItem("New Sale"));
 
-        bar = new MenuBar(customer, sale);
+        bar = new MenuBar(new_sales, customer, sale);
     }
 
     public MenuBar displayNav(boolean manager){

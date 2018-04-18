@@ -22,6 +22,16 @@ public class Employee implements DataInterface{
         this.age = 0;
     }
 
+    public Employee(String super_name, String first_name, String last_name, String address, String sex, int age, String store) {
+        this.super_name = super_name;
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.address = address;
+        this.sex = sex;
+        this.age = age;
+        this.store = store;
+    }
+
     public Employee(int ssn, String super_name, String first_name, String last_name, String address, String sex, int age, String store) {
         this.ssn = ssn;
         this.super_name = super_name;
