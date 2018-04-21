@@ -17,6 +17,7 @@ public class Storage {
 
     private DataInterface item;
     private String store_location = "Towson";
+    private String employeeName;
     private Statement statement;
     private ResultSet resultSet;
 
@@ -25,14 +26,40 @@ public class Storage {
     }
 
     boolean isManager(){
-        return true;
+        try {
+            resultSet = statement.executeQuery("select concat_ws(' ', s.fname, s.lname) " +
+                    "from employee as e, employee as s " +
+                    "where s.ssn = e.super_ssn " +
+                    "and concat_ws(' ', s.fname, s.lname) = \""+employeeName+"\"");
+
+            return resultSet.next();
+
+        }catch (SQLException ex){ex.printStackTrace();}
+
+        return false;
     }
 
     boolean isEmployee(String user, String pass) {
 
-        System.out.println(user+"\n"+pass);
+        try {
+            resultSet = statement.executeQuery("select username, password, ssn from account");
 
-        return (user.equals("John") && pass.equals("12345"));
+            while(resultSet.next()) {
+                if((user.equals(resultSet.getString(1)) && pass.equals(resultSet.getString(2)))) {
+
+                    resultSet = statement.executeQuery("select concat_ws(' ', fname, lname) " +
+                            "from employee " +
+                            "where employee.ssn = \"" +resultSet.getInt(3)+"\";");
+
+                    resultSet.next();
+                    employeeName = resultSet.getString(1);
+
+                    return true;
+                }
+            }
+        }catch (SQLException ex){ex.printStackTrace();}
+
+        return false;
     }
 
     ArrayList<String> getStore(){ return getStores(); }
@@ -207,17 +234,18 @@ public class Storage {
 
         try{
 
-            resultSet = statement.executeQuery("select fname, lname, sex, address, balance from customer where " +
-                    "concat_ws(' ',fname, lname) = \"" + data +"\" ");
+            resultSet = statement.executeQuery("select c_id, fname, lname, sex, address, balance from customer " +
+                    "where concat_ws(' ',fname, lname) = \"" + data +"\" ");
 
             resultSet.next();
-            String fname = resultSet.getString(1);
-            String lname = resultSet.getString(2);
-            String sex = resultSet.getString(3);
-            String address = resultSet.getString(4);
-            String balance = resultSet.getString(5);
+            int id = resultSet.getInt(1);
+            String fname = resultSet.getString(2);
+            String lname = resultSet.getString(3);
+            String sex = resultSet.getString(4);
+            String address = resultSet.getString(5);
+            String balance = resultSet.getString(6);
 
-            customer = new Customer(fname, lname, address, sex, balance);
+            customer = new Customer(id, fname, lname, address, sex, balance);
         }catch (SQLException ex){
             ex.printStackTrace();
             customer = new Customer();
@@ -228,38 +256,58 @@ public class Storage {
 
     private DataInterface getReceipt(String data){
 
-        ArrayList<Receipt> list = new ArrayList<>();
+        Receipt receipt;
+        ArrayList<Product> products = new ArrayList<>();
 
-        Product p1 = new Product("Product 1", "", 0, 5.0);
-        Product p2 = new Product("Product 2", "", 0, 4.0);
-        Product p3 = new Product("Product 3", "", 0, 3.0);
-        Product p4 = new Product("Product 4", "", 0, 2.0);
-        Product p5 = new Product("Product 5", "", 0, 1.0);
+        try {
+            resultSet = statement.executeQuery("select s.s_id, s.total_cost, s.date, " +
+                    "store.location " +
+                    "from sale as s, " +
+                    "store inner join sold_at on sold_at.store_id = store.store_id " +
+                    "where sold_at.s_id = s.s_id " +
+                    "and s.s_id = \"" + data + "\";");
 
-        ArrayList<Product> products1 = new ArrayList<>();
-        products1.add(p1);
-        products1.add(p3);
-        products1.add(p5);
+            resultSet.next();
+            int id = resultSet.getInt(1);
+            double cost = resultSet.getDouble(2);
+            String date = resultSet.getString(3);
+            String store = resultSet.getString(4);
 
-        ArrayList<Product> products2 = new ArrayList<>();
-        products2.add(p1);
-        products2.add(p2);
-        products2.add(p4);
 
-        Date date = new Date();
+            String customerName = "";
 
-        list.add(new Receipt("Nick", "Frederick", products1, date.toString()));
-        list.add(new Receipt("Jessica","Towson", products2, date.toString()));
 
-        list.get(0).setId(1);
-        list.get(1).setId(2);
+            resultSet = statement.executeQuery("select concat_ws(' ', customer.fname,customer.lname) " +
+                    "from sale, customer inner join makes_sale on makes_sale.c_id = customer.c_id " +
+                    "where makes_sale.s_id = sale.s_id " +
+                    "and sale.s_id = \""+data+"\";");
 
-        for(Receipt receipt: list){
-            if(data.equals(receipt.getId()+""))
-                return receipt;
+            if(resultSet.next())
+                customerName = resultSet.getString(1);
+
+
+            resultSet = statement.executeQuery("select products.p_id, products.name, products.description, products.amt_left, products.price " +
+                    "from items_sold as p inner join products on p.P_id = products.P_id, sale " +
+                    "where sale.s_id = p.s_id " +
+                    "and sale.s_id = \""+data+"\";");
+
+            while(resultSet.next()){
+                int p_id = resultSet.getInt(1);
+                String p_name = resultSet.getString(2);
+                String p_descrip = resultSet.getString(3);
+                int amt_left = resultSet.getInt(4);
+                double price = resultSet.getDouble(5);
+                products.add(new Product(p_id, p_name, p_descrip, amt_left, price));
+            }
+
+            receipt = new Receipt(id, customerName, store, cost, products, date);
+
+        }catch (SQLException ex ){
+            ex.printStackTrace();
+            receipt = new Receipt();
         }
 
-        return new Receipt();
+        return receipt;
     }
 
     private DataInterface getProduct(String data){
@@ -267,15 +315,17 @@ public class Storage {
         Product product;
 
         try {
-            resultSet = statement.executeQuery("select name, description, amt_left, price from products where name = \"" + data + "\"");
+            resultSet = statement.executeQuery("select p_id, name, description, amt_left, price from products " +
+                    "where name = \"" + data + "\"");
 
             resultSet.next();
-            String name = resultSet.getString(1);
-            String description = resultSet.getString(2);
-            int amt = Integer.parseInt(resultSet.getString(3));
-            double price = Double.parseDouble(resultSet.getString(4));
+            int id = resultSet.getInt(1);
+            String name = resultSet.getString(2);
+            String description = resultSet.getString(3);
+            int amt = resultSet.getInt(4);
+            double price = resultSet.getDouble(5);
 
-            product = new Product(name, description, amt, price);
+            product = new Product(id, name, description, amt, price);
 
         }catch (SQLException e){
             e.printStackTrace();
@@ -305,7 +355,7 @@ public class Storage {
             String lname = resultSet.getString(2);
             String sex = resultSet.getString(3);
             String address = resultSet.getString(4);
-            int age = Integer.parseInt(resultSet.getString(5));
+            int age = resultSet.getInt(5);
             String superName = resultSet.getString(7);
             String store = resultSet.getString(6);
 

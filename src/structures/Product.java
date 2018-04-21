@@ -2,6 +2,7 @@ package structures;
 
 public class Product implements DataInterface{
 
+    private int id;
     private String name;
     private String description;
     private int amt_left;
@@ -14,12 +15,22 @@ public class Product implements DataInterface{
         this.price = 0;
     }
 
+    public Product(int id, String name, String description, int amt_left, double price){
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.amt_left = amt_left;
+        this.price = price;
+    }
+
     public Product(String name, String description, int amt_left, double price){
         this.name = name;
         this.description = description;
         this.amt_left = amt_left;
         this.price = price;
     }
+
+    public int getId(){ return id; }
 
     public String getName() {
         return name;
