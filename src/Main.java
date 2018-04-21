@@ -16,7 +16,7 @@ public class Main extends Application {
         Display display = new Display(root);
         Storage storage = new Storage();
 
-        Controller controller = new Controller(display, storage);
+        new Controller(display, storage);
 
         primaryStage.setTitle("Hello World");
         primaryStage.setScene(new Scene(root, 300, 275));

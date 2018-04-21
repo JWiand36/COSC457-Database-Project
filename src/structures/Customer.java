@@ -2,7 +2,6 @@ package structures;
 
 public class Customer implements DataInterface{
 
-    private int id;
     private String first_name;
     private String last_name;
     private String address;
@@ -10,7 +9,6 @@ public class Customer implements DataInterface{
     private double balance;
 
     public Customer(){
-        this.id = 0;
         this.first_name = "";
         this.last_name = "";
         this.address = "";
@@ -18,8 +16,7 @@ public class Customer implements DataInterface{
         this.balance = 0;
     }
 
-    public Customer(int id, String first_name, String last_name, String address, String sex, String balance){
-        this.id = id;
+    public Customer(String first_name, String last_name, String address, String sex, String balance){
         this.first_name = first_name;
         this.last_name = last_name;
         this.address = address;
@@ -33,10 +30,6 @@ public class Customer implements DataInterface{
         this.address = address;
         this.sex = sex;
         this.balance = 0;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public String getFirst_name() {
@@ -57,10 +50,6 @@ public class Customer implements DataInterface{
 
     public double getBalance() {
         return balance;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public void setFirst_name(String first_name) {

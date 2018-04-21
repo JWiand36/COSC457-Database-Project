@@ -35,9 +35,13 @@ public class Controller {
         return storage.getData(n);
     }
 
-    public String getEmployee(){ return storage.getEmployee(); }
+    ArrayList<String> getData(String data, int n){
+        return storage.getData(data, n);
+    }
 
-    public String getStore(){ return storage.getStore(); }
+    ArrayList<String> getStores(){ return storage.getStore(); }
+
+    public String getOneStore(){ return storage.getOneStore(); }
 
     //determine's if the login is correct.
     public boolean isEmployee(String user, String pass){
@@ -67,6 +71,8 @@ public class Controller {
     public void subAmt(int amount){
         storage.subAmt(amount);
     }
+
+    void setStore(String store){ storage.setStore(store);}
 
     //Transfers one entity to the display
     DataInterface getOne(String data, int current_pane){

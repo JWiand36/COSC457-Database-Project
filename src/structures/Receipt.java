@@ -6,7 +6,6 @@ public class Receipt implements DataInterface{
 
     private int id;
     private String customer_name;
-    private String employee_name;
     private String store_location;
     private double total_balance;
     private ArrayList<Product> products;
@@ -15,16 +14,14 @@ public class Receipt implements DataInterface{
     public Receipt(){
         this.id = 0;
         this.customer_name = "";
-        this.employee_name = "";
         this.store_location = "";
         this.total_balance = 0;
         this.products = new ArrayList<>();
         this.date = "";
     }
 
-    public Receipt(String customer_name, String employee_name, String store_location, ArrayList<Product> products, String date) {
+    public Receipt(String customer_name, String store_location, ArrayList<Product> products, String date) {
         this.customer_name = customer_name;
-        this.employee_name = employee_name;
         this.store_location = store_location;
 
         for(Product product: products)
@@ -34,10 +31,9 @@ public class Receipt implements DataInterface{
         this.date = date;
     }
 
-    public Receipt(int id, String customer_name, String employee_name, String store_location, double total_balance, ArrayList<Product> products, String date){
+    public Receipt(int id, String customer_name, String store_location, double total_balance, ArrayList<Product> products, String date){
         this.id = id;
         this.customer_name = customer_name;
-        this.employee_name = employee_name;
         this.store_location = store_location;
         this.total_balance = total_balance;
         this. products = products;
@@ -56,13 +52,7 @@ public class Receipt implements DataInterface{
         return customer_name;
     }
 
-    public String getEmployee_name() {
-        return employee_name;
-    }
-
-    public String getStore_location() {
-        return store_location;
-    }
+    public String getStore_location() { return store_location; }
 
     public double getTotal_balance() {
         return total_balance;

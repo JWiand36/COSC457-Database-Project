@@ -19,9 +19,11 @@ public class AddProduct implements DisplayInterface{
     private TextField amt = new TextField();
     private TextField price = new TextField();
 
-    public AddProduct(Controller controller){
+    public AddProduct(Controller controller, Display display){
 
         this.pane = new GridPane();
+        Button warehouse = new Button("Warehouse");
+        Button vendor = new Button("Vendor");
         Button submit = new Button("Submit");
         Button edit = new Button("Edit");
         Button add = new Button("Add");
@@ -37,10 +39,12 @@ public class AddProduct implements DisplayInterface{
         pane.add(amt,1,1);
         pane.add(price,3,1);
 
-        pane.add(submit, 3,2);
-        pane.add(edit, 2, 2);
-        pane.add(remove, 1, 2);
         pane.add(add, 0,2);
+        pane.add(remove, 1, 2);
+        pane.add(warehouse, 2, 2);
+        pane.add(vendor, 3, 2);
+        pane.add(submit, 0,3);
+        pane.add(edit, 1, 3);
 
        // public Product(String name, String description, int amt_left, double price){
 
@@ -59,13 +63,13 @@ public class AddProduct implements DisplayInterface{
             controller.editData(product, Display.INVENTORY);
         });
 
-        add.setOnAction(e->{
-            controller.addAmt(Integer.parseInt(amt.getText()));
-        });
+        add.setOnAction(e-> controller.addAmt(Integer.parseInt(amt.getText())));
 
-        remove.setOnAction(e->{
-            controller.subAmt(Integer.parseInt(amt.getText()));
-        });
+        remove.setOnAction(e-> controller.subAmt(Integer.parseInt(amt.getText())));
+
+        warehouse.setOnAction(e-> display.displaySideInfo(Display.WARHOUSE));
+
+        vendor.setOnAction(e-> display.displaySideInfo(Display.VENDOR));
     }
 
     @Override

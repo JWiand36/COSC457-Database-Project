@@ -13,7 +13,6 @@ import structures.Product;
 import structures.Receipt;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 
 public class AddSale implements DisplayInterface{
@@ -31,9 +30,6 @@ public class AddSale implements DisplayInterface{
 
     private Text total = new Text(0+"");
 
-    //public Receipt(String customer_name, String employee_name, String store_location, Product[] products, String date) {
-
-
     public AddSale(Controller controller){
 
         this.pane = new FlowPane();
@@ -41,7 +37,7 @@ public class AddSale implements DisplayInterface{
         this.controller = controller;
 
         submit.setOnAction(e->{
-            Receipt receipt = new Receipt(customer.getText(), getEmployee(), getStore(), products, new Date().toString());
+            Receipt receipt = new Receipt(customer.getText(), getStore(), products, new Date().toString());
 
             controller.addData(receipt, Display.SALES);
         });
@@ -77,12 +73,8 @@ public class AddSale implements DisplayInterface{
         return pane;
     }
 
-    private String getEmployee(){
-        return controller.getEmployee();
-    }
-
     private String getStore(){
-        return controller.getStore();
+        return controller.getOneStore();
     }
 
     private String addTotal(double amount){

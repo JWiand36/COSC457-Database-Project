@@ -34,6 +34,8 @@ public class Display {
     //Navigation and the List on the side
     private Navigation nav;
     private SideBar side;
+    private VendorInfo vendor;
+    private WarehouseInfo warehouse;
 
     private Controller controller;
 
@@ -44,7 +46,9 @@ public class Display {
     public static final int SALES = 2;
     public static final int INVENTORY = 3;
     public static final int EMPLOYEE = 4;
-    public static final int ADD_SALE = 5;
+    static final int ADD_SALE = 5;
+    public static final int WARHOUSE = 6;
+    public static final int VENDOR = 7;
 
     public Display(BorderPane main){
         this.main = main;
@@ -62,11 +66,13 @@ public class Display {
 
         this.add_customer = new AddCustomer(controller);
         this.add_employee = new AddEmployee(controller);
-        this.add_product = new AddProduct(controller);
+        this.add_product = new AddProduct(controller, this);
         this.add_sale = new AddSale(controller);
 
         this.nav = new Navigation(this);
         this.side = new SideBar(this);
+        this.vendor = new VendorInfo();
+        this.warehouse = new WarehouseInfo();
 
         main.setCenter(login.display());
     }
@@ -75,11 +81,14 @@ public class Display {
         this.controller = controller;
     }
 
+    public void setStore(String store){ controller.setStore(store); }
+
     //Displays the navigation bar with the Sales panes as a default
     public void displayNav(){
-        side.setInfo(controller.getData(SALES));
+        side.getStores(controller.getStores());
 
         this.current_pane = SALES;
+        setInfo();
 
         main.setTop(nav.displayNav(controller.isManager()));
         main.setCenter(sale.display());
@@ -87,14 +96,28 @@ public class Display {
 
     }
 
+    public void displaySideInfo(int num){
+        if(num == WARHOUSE){
+           if(main.getLeft() != null && main.getLeft() == warehouse.display())
+               main.setLeft(null);
+           else
+               main.setLeft(warehouse.display());
+        }else{
+            if(main.getLeft() != null && main.getLeft() == vendor.display())
+                main.setLeft(null);
+            else
+                main.setLeft(vendor.display());
+        }
+    }
+
     //General method used to display the main pain and the add pane. The integer is to hold the current pane
     //for data transfer.
     public void display(DisplayInterface dis, DisplayInterface add, int n){
-        side.setInfo(controller.getData(n));
-
         this.current_pane = n;
+        setInfo();
 
         main.setCenter(dis.display());
+        main.setLeft(null);
 
         if(add != null)
             main.setBottom(add.display());
@@ -142,6 +165,8 @@ public class Display {
         }else if(current_pane == INVENTORY){
             inventory.displayOne((Product) obj);
             add_product.displayOne((Product) obj);
+            vendor.setData(controller.getData(data, VENDOR));
+            warehouse.setData(controller.getData(data, WARHOUSE));
         }else if(current_pane == EMPLOYEE){
             employee.displayOne((structures.Employee) obj);
             add_employee.displayOne((structures.Employee) obj);
@@ -149,5 +174,9 @@ public class Display {
             add_sale.displayOne((structures.Product) obj);
         }
 
+    }
+
+    public void setInfo(){
+        side.setInfo(controller.getData(current_pane));
     }
 }

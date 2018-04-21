@@ -2,6 +2,12 @@ package services;
 
 import structures.*;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.SQLException;
+
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -10,8 +16,13 @@ import static services.Display.*;
 public class Storage {
 
     private DataInterface item;
-    private String employee_name = "John";
     private String store_location = "Towson";
+    private Statement statement;
+    private ResultSet resultSet;
+
+    public Storage(){
+        setUpDatabase();
+    }
 
     boolean isManager(){
         return true;
@@ -21,17 +32,12 @@ public class Storage {
 
         System.out.println(user+"\n"+pass);
 
-        if(user.equals("John") && pass.equals("12345")){
-            employee_name = user;
-            return true;
-        }else
-            return false;
+        return (user.equals("John") && pass.equals("12345"));
     }
 
-    String getEmployee(){ return employee_name;}
+    ArrayList<String> getStore(){ return getStores(); }
 
-    String getStore(){ return store_location; }
-
+    String getOneStore(){ return this.store_location; }
 
     DataInterface getOne(String data, int location){
 
@@ -73,48 +79,151 @@ public class Storage {
         }
     }
 
+    void setStore(String store){ this.store_location = store; }
 
-    //All these methods are going to be reworked. All data contained in these methods are going to be removed
-    //when an actual database is used. These place holders are in place just to prove the front end works.
+    private void setUpDatabase(){
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost/project?autoReconnect=true&useSSL=false",
+                    "project", "mypassword");
+
+            statement = connection.createStatement();
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
     ArrayList<String> getData(int n){
 
         ArrayList<String> result = new ArrayList<>();
 
-        if(n == CUSTOMERS){
-            result.add("Ryan");
-            result.add("Lindsy");
-        }else if(n == SALES){
+        try {
+            if (n == CUSTOMERS) {
+                resultSet = statement.executeQuery("select concat_ws(' ',customer.fname, customer.lname) as name "
+                        +"from customer " +
+                        "where customer.c_id in " +
+                            "(select c_id " +
+                            "from shopat, store " +
+                            "where shopat.store_id = store.store_id " +
+                            "and store.location = \""+ store_location +"\");");
+            } else if (n == SALES) {
+                resultSet = statement.executeQuery("select S_id from sale " +
+                        "where sale.s_id in " +
+                            "(select s_id " +
+                            "from sold_at, store " +
+                            "where sold_at.store_id = store.store_id " +
+                            "and store.location = \""+ store_location +"\");");
+            } else if (n == INVENTORY) {
+                resultSet = statement.executeQuery("select Name from products " +
+                        "where products.p_id in " +
+                            "(select p_id " +
+                            "from has, store " +
+                            "where has.store_id = store.store_id " +
+                            "and store.location = \""+ store_location +"\");");
+            } else if (n == EMPLOYEE) {
+                resultSet = statement.executeQuery("select concat_ws(' ',employee.fname, employee.lname) as name " +
+                        "from employee, store " +
+                        "where employee.works_at = store.store_id " +
+                        "and store.location = \""+ store_location +"\";");
+            } else if (n == ADD_SALE) {
+                resultSet = statement.executeQuery("select Name from products " +
+                        "where products.p_id in " +
+                        "(select p_id " +
+                        "from has, store " +
+                        "where has.store_id = store.store_id " +
+                        "and store.location = \""+ store_location +"\");");
+            }
 
-            result.add("1");
-            result.add("2");
+            int i = 1;
 
-        }else if(n == INVENTORY){
-            result.add("Construction Paper");
-            result.add("Kill a Mocking Bird");
-        }else if(n == EMPLOYEE){
-            result.add("John");
-            result.add("Stacy");
-        }else if(n == ADD_SALE){
-            result.add("Construction Paper");
-            result.add("Kill a Mocking Bird");
+            while(resultSet.next()){
+                result.add(resultSet.getString(i));
+            }
+        }catch (SQLException ex ){
+            ex.printStackTrace();
         }
 
         return result;
     }
 
-    private DataInterface getCustomer(String data){
+    ArrayList<String> getData(String data, int n) {
 
-        ArrayList<Customer> list = new ArrayList<>();
+        ArrayList<String> result = new ArrayList<>();
 
-        list.add(new Customer("Ryan", "Corn", "Towson", "Male"));
-        list.add(new Customer("Lindsy", "Davis", "Washington DC", "Female"));
-
-        for(Customer customer: list){
-            if(data.equals(customer.getFirst_name()))
-                return customer;
+        try{
+         if (n == VENDOR) {
+            resultSet = statement.executeQuery("select vendor.Name "+
+                    "from vendor, supplies "+
+                    "where vendor.v_id = supplies.v_id "+
+                    "AND supplies.p_id in "+
+                    "(select p_id "+
+                    "from products "+
+                    "where products.name = \""+data+"\");");
+        } else if (n == WARHOUSE) {
+            resultSet = statement.executeQuery("select warehouse.location "+
+                    "from warehouse, contains "+
+                    "where warehouse.w_id = contains.w_id "+
+                    "AND contains.p_id in "+
+                    "(select p_id "+
+                    "from products "+
+                    "where products.name = \""+data+"\");");
         }
 
-        return new Customer();
+        int i = 1;
+
+        while(resultSet.next()){
+            result.add(resultSet.getString(i));
+        }
+
+        }catch (SQLException ex ){
+            ex.printStackTrace();
+        }
+
+        return result;
+    }
+
+        private ArrayList<String> getStores(){
+        ArrayList<String> result = new ArrayList<>();
+
+        try{
+            resultSet = statement.executeQuery("select location from store");
+
+            int i = 1;
+            while(resultSet.next()){
+                result.add(resultSet.getString(i));
+            }
+        }catch (SQLException ex){
+            ex.printStackTrace();
+        }
+        return result;
+    }
+
+    private DataInterface getCustomer(String data){
+
+        Customer customer;
+
+        try{
+
+            resultSet = statement.executeQuery("select fname, lname, sex, address, balance from customer where " +
+                    "concat_ws(' ',fname, lname) = \"" + data +"\" ");
+
+            resultSet.next();
+            String fname = resultSet.getString(1);
+            String lname = resultSet.getString(2);
+            String sex = resultSet.getString(3);
+            String address = resultSet.getString(4);
+            String balance = resultSet.getString(5);
+
+            customer = new Customer(fname, lname, address, sex, balance);
+        }catch (SQLException ex){
+            ex.printStackTrace();
+            customer = new Customer();
+        }
+
+        return customer;
     }
 
     private DataInterface getReceipt(String data){
@@ -139,8 +248,8 @@ public class Storage {
 
         Date date = new Date();
 
-        list.add(new Receipt("Nick", "Cindy", "Frederick", products1, date.toString()));
-        list.add(new Receipt("Jessica", "Brad", "Towson", products2, date.toString()));
+        list.add(new Receipt("Nick", "Frederick", products1, date.toString()));
+        list.add(new Receipt("Jessica","Towson", products2, date.toString()));
 
         list.get(0).setId(1);
         list.get(1).setId(2);
@@ -155,32 +264,59 @@ public class Storage {
 
     private DataInterface getProduct(String data){
 
-        ArrayList<Product> list = new ArrayList<>();
+        Product product;
 
-        list.add(new Product("Construction Paper", "Paper", 30, 3.50));
-        list.add(new Product("Kill a Mocking Bird", "Book", 10, 5.00));
+        try {
+            resultSet = statement.executeQuery("select name, description, amt_left, price from products where name = \"" + data + "\"");
 
-        for(Product product: list){
-            if(data.equals(product.getName()))
-                return product;
+            resultSet.next();
+            String name = resultSet.getString(1);
+            String description = resultSet.getString(2);
+            int amt = Integer.parseInt(resultSet.getString(3));
+            double price = Double.parseDouble(resultSet.getString(4));
+
+            product = new Product(name, description, amt, price);
+
+        }catch (SQLException e){
+            e.printStackTrace();
+            product = new Product();
         }
 
-        return new Product();
+        return product;
     }
 
     private DataInterface getEmployee(String data){
 
-        ArrayList<Employee> list = new ArrayList<>();
 
-        list.add(new Employee(0, "Stacy Smith", "John", "Doe", "Frederick", "Male", 35, "Frederick"));
-        list.add(new Employee(1, "", "Stacy", "Smith", "Walkersville", "Female", 40, "Frederick"));
+        Employee employee;
 
-        for(Employee employee: list){
-            if(data.equals(employee.getFirst_name()))
-                return employee;
+        try{
+
+            resultSet = statement.executeQuery("select e.fname, e.lname, e.sex, e.address, e.age, t.location, " +
+                        "(select concat_ws(' ',fname, lname) " +
+                        "from employee " +
+                        "where e.super_ssn = ssn) " +
+                    "from employee as e, store as t " +
+                    "where concat_ws(' ',e.fname, e.lname) = \"" + data +"\" " +
+                    "and e.works_at = t.store_id");
+
+            resultSet.next();
+            String fname = resultSet.getString(1);
+            String lname = resultSet.getString(2);
+            String sex = resultSet.getString(3);
+            String address = resultSet.getString(4);
+            int age = Integer.parseInt(resultSet.getString(5));
+            String superName = resultSet.getString(7);
+            String store = resultSet.getString(6);
+
+            employee = new Employee(superName, fname, lname, address, sex, age, store);
+        }catch (SQLException ex){
+            ex.printStackTrace();
+            employee = new Employee();
         }
 
-        return new Employee();
+
+        return employee;
     }
 
     private void addCustomer(Customer customer){
@@ -189,7 +325,7 @@ public class Storage {
     }
 
     private void addSale(Receipt receipt){
-        System.out.println("Added Sale: " + receipt.getCustomer_name() + ":" + receipt.getEmployee_name() + ":" + receipt.getTotal_balance());
+        System.out.println("Added Sale: " + receipt.getCustomer_name() + ":" + ":" + receipt.getTotal_balance());
 
     }
 
