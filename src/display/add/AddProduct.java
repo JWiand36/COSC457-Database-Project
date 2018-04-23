@@ -1,7 +1,9 @@
 package display.add;
 
 import display.main.DisplayInterface;
+import javafx.collections.FXCollections;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
@@ -9,6 +11,8 @@ import javafx.scene.layout.Pane;
 import services.Controller;
 import services.Display;
 import structures.Product;
+
+import java.util.ArrayList;
 
 public class AddProduct implements DisplayInterface{
 
@@ -25,7 +29,6 @@ public class AddProduct implements DisplayInterface{
         Button warehouse = new Button("Warehouse");
         Button vendor = new Button("Vendor");
         Button submit = new Button("Submit");
-        Button edit = new Button("Edit");
         Button add = new Button("Add");
         Button remove = new Button("Reduce");
 
@@ -39,14 +42,11 @@ public class AddProduct implements DisplayInterface{
         pane.add(amt,1,1);
         pane.add(price,3,1);
 
-        pane.add(add, 0,2);
-        pane.add(remove, 1, 2);
-        pane.add(warehouse, 2, 2);
-        pane.add(vendor, 3, 2);
-        pane.add(submit, 0,3);
-        pane.add(edit, 1, 3);
-
-       // public Product(String name, String description, int amt_left, double price){
+        pane.add(add, 0,3);
+        pane.add(remove, 1, 3);
+        pane.add(warehouse, 2, 3);
+        pane.add(vendor, 3, 3);
+        pane.add(submit, 0,4);
 
 
         submit.setOnAction(e->{
@@ -54,13 +54,6 @@ public class AddProduct implements DisplayInterface{
                     Double.parseDouble(price.getText()));
 
             controller.addData(product, Display.INVENTORY);
-        });
-
-        edit.setOnAction(e->{
-            Product product = new Product(name.getText(), description.getText(), Integer.parseInt(amt.getText()),
-                    Double.parseDouble(price.getText()));
-
-            controller.editData(product, Display.INVENTORY);
         });
 
         add.setOnAction(e-> controller.addAmt(Integer.parseInt(amt.getText())));
@@ -82,5 +75,6 @@ public class AddProduct implements DisplayInterface{
         this.description.setText(product.getDescription());
         this.amt.setText(product.getAmt_left() + "");
         this.price.setText(product.getPrice() + "");
+
     }
 }

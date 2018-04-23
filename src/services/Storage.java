@@ -7,19 +7,22 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.SQLException;
+import java.sql.PreparedStatement;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 import static services.Display.*;
 
 public class Storage {
 
     private DataInterface item;
+    private int store_id = 1;
     private String store_location = "Towson";
     private String employeeName;
     private Statement statement;
     private ResultSet resultSet;
+    private Connection connection;
+    private PreparedStatement preparedStatement;
 
     public Storage(){
         setUpDatabase();
@@ -95,24 +98,21 @@ public class Storage {
         }
     }
 
-    void editData(DataInterface data, int current_pane){
+    void setStore(String store){
+        this.store_location = store;
 
-        if(current_pane == CUSTOMERS){
-            editCustomer((Customer) data);
-        }else if(current_pane == INVENTORY){
-            editProduct((Product) data);
-        }else if(current_pane == EMPLOYEE){
-            editEmployee((Employee) data);
-        }
+        try{
+            resultSet = statement.executeQuery("select store_id from store where location = '"+store_location+"';");
+            resultSet.next();
+            store_id = resultSet.getInt(1);
+        }catch (SQLException ex){ ex.printStackTrace(); }
     }
-
-    void setStore(String store){ this.store_location = store; }
 
     private void setUpDatabase(){
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
 
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost/project?autoReconnect=true&useSSL=false",
+            connection = DriverManager.getConnection("jdbc:mysql://localhost/project?autoReconnect=true&useSSL=false",
                     "project", "mypassword");
 
             statement = connection.createStatement();
@@ -121,6 +121,12 @@ public class Storage {
             e.printStackTrace();
         }
 
+    }
+
+    public void closeDatabase(){
+        try{
+            connection.close();
+        }catch (SQLException ex){ex.printStackTrace();}
     }
 
     ArrayList<String> getData(int n){
@@ -370,48 +376,173 @@ public class Storage {
     }
 
     private void addCustomer(Customer customer){
-        System.out.println("Added Customer: " + customer.getFirst_name());
 
+        try{
+            resultSet = statement.executeQuery("select c_id from customer where concat_ws(' ', fname, lname) = " +
+                    "'"+customer.getFirst_name()+" "+customer.getLast_name()+"'");
+
+            if(resultSet.next()){
+                int id = resultSet.getInt(1);
+
+                preparedStatement = connection.prepareStatement("update customer " +
+                        "set fname = ?, lname = ?, sex = ?, address = ?, balance = ? " +
+                        "where c_id = " + id);
+
+                preparedStatement.setString(1,customer.getFirst_name());
+                preparedStatement.setString(2,customer.getLast_name());
+                preparedStatement.setString(3,customer.getSex().charAt(0)+"");
+                preparedStatement.setString(4,customer.getAddress());
+                preparedStatement.setString(5,customer.getBalance()+"");
+                preparedStatement.executeUpdate();
+
+                resultSet = statement.executeQuery("select c_id from shopAt where c_id = " + id);
+                if(resultSet.next()){
+
+                    preparedStatement.executeUpdate("update shopat set store_id = "+store_id+" where c_id = "+id);
+
+                }else {
+                    preparedStatement = connection.prepareStatement("insert into shopat(c_id, store_id) " +
+                            "values (?," + store_id + ")");
+                    preparedStatement.setString(1, id+"");
+                    preparedStatement.executeUpdate();
+                }
+            }else{
+
+                preparedStatement = connection.prepareStatement("insert into customer(fname, " +
+                        "lname, sex, address, balance) values (?,?,?,?, 0.0)");
+                preparedStatement.setString(1,customer.getFirst_name());
+                preparedStatement.setString(2,customer.getLast_name());
+                preparedStatement.setString(3,customer.getSex().charAt(0)+"");
+                preparedStatement.setString(4,customer.getAddress());
+                preparedStatement.executeUpdate();
+
+                resultSet = statement.executeQuery("select c_id from customer where concat_ws(' ', fname, lname) = " +
+                        "'"+customer.getFirst_name()+" "+customer.getLast_name()+"'");
+                resultSet.next();
+
+                preparedStatement = connection.prepareStatement("insert into shopat(c_id, store_id) " +
+                        "values (?,"+store_id+")");
+                preparedStatement.setString(1,resultSet.getString(1));
+                preparedStatement.executeUpdate();
+            }
+
+        }catch (SQLException ex){ ex.printStackTrace(); }
     }
 
     private void addSale(Receipt receipt){
-        System.out.println("Added Sale: " + receipt.getCustomer_name() + ":" + ":" + receipt.getTotal_balance());
+
+//    public Receipt(String customer_name, String store_location, ArrayList<Product> products, String date) {
 
     }
 
     private void addProduct(Product product){
-        System.out.println("Added Product: " + product.getName() + ":" + product.getAmt_left());
 
+//    public Product(String name, String description, int amt_left, double price){
+
+        try {
+            resultSet = statement.executeQuery("select p_id from products where name = '"+product.getName()+"';");
+
+            if(resultSet.next()){
+                int id = resultSet.getInt(1);
+
+                preparedStatement = connection.prepareStatement("update products " +
+                        "set name = ?, description = ?, amt_left = ?, price = ? " +
+                        "where name = '" + product.getName() +"'");
+
+                preparedStatement.setString(1,product.getName());
+                preparedStatement.setString(2,product.getDescription());
+                preparedStatement.setInt(3,product.getAmt_left());
+                preparedStatement.setDouble(4,product.getPrice());
+                preparedStatement.executeUpdate();
+
+                resultSet = statement.executeQuery("select p_id from has where p_id = " + id+" and store_id = "+store_id);
+                if(!resultSet.next()){
+                    preparedStatement = connection.prepareStatement("insert into has (store_id, p_id) values("+store_id+","+
+                            id+");");
+                    preparedStatement.executeUpdate();
+                }
+            }else{
+                preparedStatement = connection.prepareStatement("insert into products(name, " +
+                        "description, amt_left, price) values (?,?,?,?)");
+                preparedStatement.setString(1,product.getName());
+                preparedStatement.setString(2,product.getDescription());
+                preparedStatement.setInt(3,product.getAmt_left());
+                preparedStatement.setDouble(4,product.getPrice());
+                preparedStatement.executeUpdate();
+
+                resultSet = statement.executeQuery("select p_id from products where name = '"+product.getName()+"';");
+                resultSet.next();
+
+                preparedStatement = connection.prepareStatement("insert into has (store_id, p_id) values("+store_id+","+
+                        resultSet.getInt(1)+");");
+                preparedStatement.executeUpdate();
+            }
+        }catch (SQLException ex){ex.printStackTrace();}
     }
 
     private void addEmployee(Employee employee){
-        System.out.println("Added Employee: " + employee.getFirst_name());
 
-    }
+        try{
+            resultSet = statement.executeQuery("select concat_ws(' ', fname, lname) from employee where concat_ws(' ', fname, lname) = " +
+                    "'"+employee.getFirst_name()+" "+employee.getLast_name()+"'");
 
-    private void editCustomer(Customer customer){
-        System.out.println("Edited Customer: " + customer.getFirst_name());
+            if(resultSet.next()){
+                String name = resultSet.getString(1);
 
-    }
+                resultSet = statement.executeQuery("select ssn from employee where concat_ws(' ', fname, lname) = " +
+                        "'"+employee.getSuper_Name()+"'");
 
-    private void editProduct(Product product){
-        System.out.println("Edited Product: " + product.getName() + ":" + product.getAmt_left());
-    }
+                preparedStatement = connection.prepareStatement("update employee " +
+                        "set fname = ?, lname = ?, sex = ?, address = ?, age = ?, super_ssn = ?, works_at = ? " +
+                        "where concat_ws(' ', fname, lname) = '" + name+"'");
 
-    private void editEmployee(Employee employee){
-        System.out.println("Edited Employee: " + employee.getFirst_name());
+                preparedStatement.setString(1,employee.getFirst_name());
+                preparedStatement.setString(2,employee.getLast_name());
+                preparedStatement.setString(3,employee.getSex().charAt(0)+"");
+                preparedStatement.setString(4,employee.getAddress());
+                preparedStatement.setString(5,employee.getAge()+"");
+
+                if(resultSet.next())
+                    preparedStatement.setInt(6,resultSet.getInt(1));
+                else
+                    preparedStatement.setString(6,null);
+
+                preparedStatement.setInt(7,store_id);
+                preparedStatement.executeUpdate();
+
+            }else{
+                resultSet = statement.executeQuery("select ssn from employee where concat_ws(' ', fname, lname) = " +
+                        "'"+employee.getSuper_Name()+"'");
+
+                preparedStatement = connection.prepareStatement("insert into employee(fname, " +
+                        "lname, sex, address, age, super_ssn, works_at, ssn) values (?,?,?,?,?,?,?,?)");
+                preparedStatement.setString(1,employee.getFirst_name());
+                preparedStatement.setString(2,employee.getLast_name());
+                preparedStatement.setString(3,employee.getSex().charAt(0)+"");
+                preparedStatement.setString(4,employee.getAddress());
+                preparedStatement.setInt(5,employee.getAge());
+
+                if(resultSet.next())
+                    preparedStatement.setInt(6,resultSet.getInt(1));
+                else
+                    preparedStatement.setString(6,null);
+
+                preparedStatement.setInt(7,store_id);
+                preparedStatement.setInt(8,employee.getSsn());
+                preparedStatement.executeUpdate();
+            }
+
+        }catch (SQLException ex){ ex.printStackTrace(); }
 
     }
 
     void addAmt(int amount){
         Product temp = (Product) item;
         temp.setAmt_left(temp.getAmt_left() + amount);
-        editProduct(temp);
     }
 
     void subAmt(int amount){
         Product temp = (Product) item;
         temp.setAmt_left(temp.getAmt_left() - amount);
-        editProduct(temp);
     }
 }

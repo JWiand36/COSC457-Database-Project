@@ -24,7 +24,6 @@ public class AddCustomer implements DisplayInterface{
         this.pane = new GridPane();
         ComboBox<String> sex = new ComboBox<>();
         Button submit = new Button("Submit");
-        Button edit = new Button("Edit");
 
         sex.getItems().addAll("Male", "Female");
 
@@ -38,20 +37,12 @@ public class AddCustomer implements DisplayInterface{
         pane.add(sex,3,1);
 
         pane.add(submit, 2,2);
-        pane.add(edit, 1, 2);
 
         submit.setOnAction(e->{
             Customer customer = new Customer(first_name.getText(), last_name.getText(),
                     address.getText(), sex.getSelectionModel().getSelectedItem());
 
             controller.addData(customer, Display.CUSTOMERS);
-        });
-
-        edit.setOnAction(e->{
-            Customer customer = new Customer(first_name.getText(), last_name.getText(),
-                    address.getText(), sex.getSelectionModel().getSelectedItem());
-
-            controller.editData(customer, Display.CUSTOMERS);
         });
     }
 

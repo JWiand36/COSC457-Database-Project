@@ -43,63 +43,33 @@ public class Employee implements DataInterface{
         this.store = store;
     }
 
-    public void setSsn(int ssn) {
-        this.ssn = ssn;
-    }
-
     public String getSuper_Name() {
         return super_name;
-    }
-
-    public void setSuper_name(String super_name) {
-        this.super_name = super_name;
     }
 
     public String getFirst_name() {
         return first_name;
     }
 
-    public void setFirst_name(String first_name) {
-        this.first_name = first_name;
-    }
-
     public String getLast_name() {
         return last_name;
-    }
-
-    public void setLast_name(String last_name) {
-        this.last_name = last_name;
     }
 
     public String getAddress() {
         return address;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
     public String getSex() {
         return sex;
-    }
-
-    public void setSex(String sex) {
-        this.sex = sex;
     }
 
     public int getAge() {
         return age;
     }
 
-    public void setAge(int age) {
-        this.age = age;
-    }
-
     public String getStore() {
         return store;
     }
 
-    public void setStore(String store) {
-        this.store = store;
-    }
+    public int getSsn(){ return ssn; }
 }

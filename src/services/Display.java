@@ -9,6 +9,8 @@ import structures.DataInterface;
 import structures.Product;
 import structures.Receipt;
 
+import java.util.ArrayList;
+
 /*
  This class controls anything dealing with the display. If an action takes place that involve
  with the display of the program. It will be in this class. Also if data is going to be displayed

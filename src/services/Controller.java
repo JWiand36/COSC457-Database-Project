@@ -52,18 +52,6 @@ public class Controller {
         storage.addData(data, current_pane);
     }
 
-    public void editData(DataInterface data, int current_pane){
-        storage.editData(data, current_pane);
-
-        if(current_pane == CUSTOMERS){
-            display.displayData(((Customer) data).getFirst_name());
-        }else if(current_pane == EMPLOYEE){
-            display.displayData(((Employee) data).getFirst_name());
-        }else if(current_pane == INVENTORY) {
-            display.displayData(((Product) data).getName());
-        }
-    }
-
     public void addAmt(int amount){
         storage.addAmt(amount);
     }

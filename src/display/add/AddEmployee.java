@@ -30,7 +30,6 @@ public class AddEmployee implements DisplayInterface{
 
         ComboBox<String> sex = new ComboBox<>();
         Button submit = new Button("Submit");
-        Button edit = new Button("Edit");
 
         sex.getItems().addAll("Male", "Female");
 
@@ -51,25 +50,15 @@ public class AddEmployee implements DisplayInterface{
         pane.add(age,1,3);
         pane.add(store,3,3);
 
-        pane.add(edit, 1,4);
         pane.add(submit, 2 , 4);
 
         submit.setOnAction(e->{
-            Employee employee = new Employee(super_name.getText() ,first_name.getText(),
+            Employee employee = new Employee(Integer.parseInt(ssn.getText()), super_name.getText() ,first_name.getText(),
                     last_name.getText(), address.getText(), sex.getSelectionModel().getSelectedItem(),
                     Integer.parseInt(age.getText()), store.getText());
 
             controller.addData(employee, Display.EMPLOYEE);
         });
-
-        edit.setOnAction(e->{
-            Employee employee = new Employee(Integer.parseInt(ssn.getText()), super_name.getText() ,first_name.getText(),
-                    last_name.getText(), address.getText(), sex.getSelectionModel().getSelectedItem(),
-                    Integer.parseInt(age.getText()), store.getText());
-
-            controller.editData(employee, Display.EMPLOYEE);
-        });
-
 
     }
 

@@ -8,13 +8,15 @@ import services.Storage;
 
 public class Main extends Application {
 
+    private Storage storage;
+
     @Override
     public void start(Stage primaryStage) throws Exception{
 
         BorderPane root = new BorderPane();
 
         Display display = new Display(root);
-        Storage storage = new Storage();
+        storage = new Storage();
 
         new Controller(display, storage);
 
@@ -23,8 +25,12 @@ public class Main extends Application {
         primaryStage.show();
     }
 
-
     public static void main(String[] args) {
         launch(args);
+    }
+
+    @Override
+    public void stop(){
+        storage.closeDatabase();
     }
 }
