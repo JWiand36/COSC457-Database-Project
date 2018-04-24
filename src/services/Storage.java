@@ -316,7 +316,7 @@ public class Storage {
         return receipt;
     }
 
-    private DataInterface getProduct(String data){
+    private Product getProduct(String data){
 
         Product product;
 
@@ -433,11 +433,54 @@ public class Storage {
 
 //    public Receipt(String customer_name, String store_location, ArrayList<Product> products, String date) {
 
+        try{
+
+            preparedStatement = connection.prepareStatement("insert into sale(total_cost, date) " +
+                    "values(?,?)");
+            preparedStatement.setDouble(1,receipt.getTotal_balance());
+            preparedStatement.setString(2,receipt.getDate());
+            preparedStatement.executeUpdate();
+
+
+            resultSet = statement.executeQuery("select s_id from sale where date = '"+receipt.getDate()+"';");
+            resultSet.next();
+            int id = resultSet.getInt(1);
+
+            preparedStatement = connection.prepareStatement("insert into sold_at (s_id, store_id) " +
+                    "values (?,?)");
+            preparedStatement.setInt(1,id);
+            preparedStatement.setInt(2,store_id);
+            preparedStatement.executeUpdate();
+
+            resultSet = statement.executeQuery("select c_id " +
+                    "from customer " +
+                    "where concat_ws(' ', fname, lname) = '" +receipt.getCustomer_name()+"'");
+            if(resultSet.next()){
+                int cid = resultSet.getInt(1);
+
+                preparedStatement = connection.prepareStatement("insert into makes_sale(c_id, s_id) " +
+                        "values (?,?)");
+                preparedStatement.setInt(1,cid);
+                preparedStatement.setInt(2,id);
+                preparedStatement.executeUpdate();
+            }
+
+            for(Product product: receipt.getProducts()){
+
+                preparedStatement = connection.prepareStatement("insert into items_sold(p_id, s_id) " +
+                        "values(?,?);");
+                preparedStatement.setInt(1,product.getId());
+                preparedStatement.setInt(2,id);
+                preparedStatement.executeUpdate();
+
+                subAmt(1,product);
+            }
+
+        }catch (SQLException ex){ex.printStackTrace();}
+
     }
 
     private void addProduct(Product product){
-
-//    public Product(String name, String description, int amt_left, double price){
 
         try {
             resultSet = statement.executeQuery("select p_id from products where name = '"+product.getName()+"';");
@@ -536,13 +579,23 @@ public class Storage {
 
     }
 
-    void addAmt(int amount){
-        Product temp = (Product) item;
-        temp.setAmt_left(temp.getAmt_left() + amount);
+    void addAmt(int amount, Product product){
+
+        try {
+            preparedStatement = connection.prepareStatement("update products " +
+                    "set amt_left = amt_left + "+amount+" " +
+                    "where name = '"+product.getName()+"';" );
+            preparedStatement.executeUpdate();
+        }catch (SQLException ex){ex.printStackTrace();}
     }
 
-    void subAmt(int amount){
-        Product temp = (Product) item;
-        temp.setAmt_left(temp.getAmt_left() - amount);
+    void subAmt(int amount, Product product){
+
+        try {
+            preparedStatement = connection.prepareStatement("update products " +
+                    "set amt_left = amt_left - "+amount+" " +
+                    "where name = '"+product.getName()+"';" );
+            preparedStatement.executeUpdate();
+        }catch (SQLException ex){ex.printStackTrace();}
     }
 }

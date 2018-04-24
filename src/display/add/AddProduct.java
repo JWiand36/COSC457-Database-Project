@@ -56,9 +56,19 @@ public class AddProduct implements DisplayInterface{
             controller.addData(product, Display.INVENTORY);
         });
 
-        add.setOnAction(e-> controller.addAmt(Integer.parseInt(amt.getText())));
+        add.setOnAction(e->{
 
-        remove.setOnAction(e-> controller.subAmt(Integer.parseInt(amt.getText())));
+                Product product = new Product(name.getText(), description.getText(), Integer.parseInt(amt.getText()),
+                Double.parseDouble(price.getText()));
+                controller.addAmt(Integer.parseInt(amt.getText()), product);
+        });
+
+        remove.setOnAction(e->{
+
+                Product product = new Product(name.getText(), description.getText(), Integer.parseInt(amt.getText()),
+                Double.parseDouble(price.getText()));
+                controller.subAmt(Integer.parseInt(amt.getText()), product);
+        });
 
         warehouse.setOnAction(e-> display.displaySideInfo(Display.WARHOUSE));
 

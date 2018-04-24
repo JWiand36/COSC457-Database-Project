@@ -52,12 +52,12 @@ public class Controller {
         storage.addData(data, current_pane);
     }
 
-    public void addAmt(int amount){
-        storage.addAmt(amount);
+    public void addAmt(int amount, Product product){
+        storage.addAmt(amount, product);
     }
 
-    public void subAmt(int amount){
-        storage.subAmt(amount);
+    public void subAmt(int amount, Product product){
+        storage.subAmt(amount, product);
     }
 
     void setStore(String store){ storage.setStore(store);}
