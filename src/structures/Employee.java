@@ -43,6 +43,10 @@ public class Employee implements DataInterface{
         this.store = store;
     }
 
+    public void setSSN(String ssn){
+        this.ssn = Integer.parseInt(ssn);
+    }
+
     public String getSuper_Name() {
         return super_name;
     }

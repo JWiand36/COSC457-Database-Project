@@ -139,8 +139,8 @@ public class Storage {
                         +"from customer " +
                         "where customer.c_id in " +
                             "(select c_id " +
-                            "from shopat, store " +
-                            "where shopat.store_id = store.store_id " +
+                            "from shop_at, store " +
+                            "where shop_at.store_id = store.store_id " +
                             "and store.location = \""+ store_location +"\");");
             } else if (n == SALES) {
                 resultSet = statement.executeQuery("select S_id from sale " +
@@ -158,8 +158,9 @@ public class Storage {
                             "and store.location = \""+ store_location +"\");");
             } else if (n == EMPLOYEE) {
                 resultSet = statement.executeQuery("select concat_ws(' ',employee.fname, employee.lname) as name " +
-                        "from employee, store " +
-                        "where employee.works_at = store.store_id " +
+                        "from employee, store, works_at " +
+                        "where works_at.store_id = store.store_id " +
+                        "and works_at.ssn = employee.ssn " +
                         "and store.location = \""+ store_location +"\";");
             } else if (n == ADD_SALE) {
                 resultSet = statement.executeQuery("select Name from products " +
@@ -352,9 +353,10 @@ public class Storage {
                         "(select concat_ws(' ',fname, lname) " +
                         "from employee " +
                         "where e.super_ssn = ssn) " +
-                    "from employee as e, store as t " +
+                    "from employee as e, store as t, works_at as w " +
                     "where concat_ws(' ',e.fname, e.lname) = \"" + data +"\" " +
-                    "and e.works_at = t.store_id");
+                    "and w.ssn = e.ssn " +
+                    "and w.store_id = t.store_id");
 
             resultSet.next();
             String fname = resultSet.getString(1);
@@ -395,13 +397,13 @@ public class Storage {
                 preparedStatement.setString(5,customer.getBalance()+"");
                 preparedStatement.executeUpdate();
 
-                resultSet = statement.executeQuery("select c_id from shopAt where c_id = " + id);
+                resultSet = statement.executeQuery("select c_id from shop_At where c_id = " + id);
                 if(resultSet.next()){
 
-                    preparedStatement.executeUpdate("update shopat set store_id = "+store_id+" where c_id = "+id);
+                    preparedStatement.executeUpdate("update shop_at set store_id = "+store_id+" where c_id = "+id);
 
                 }else {
-                    preparedStatement = connection.prepareStatement("insert into shopat(c_id, store_id) " +
+                    preparedStatement = connection.prepareStatement("insert into shop_at(c_id, store_id) " +
                             "values (?," + store_id + ")");
                     preparedStatement.setString(1, id+"");
                     preparedStatement.executeUpdate();
@@ -420,7 +422,7 @@ public class Storage {
                         "'"+customer.getFirst_name()+" "+customer.getLast_name()+"'");
                 resultSet.next();
 
-                preparedStatement = connection.prepareStatement("insert into shopat(c_id, store_id) " +
+                preparedStatement = connection.prepareStatement("insert into shop_at(c_id, store_id) " +
                         "values (?,"+store_id+")");
                 preparedStatement.setString(1,resultSet.getString(1));
                 preparedStatement.executeUpdate();
@@ -536,7 +538,7 @@ public class Storage {
                         "'"+employee.getSuper_Name()+"'");
 
                 preparedStatement = connection.prepareStatement("update employee " +
-                        "set fname = ?, lname = ?, sex = ?, address = ?, age = ?, super_ssn = ?, works_at = ? " +
+                        "set fname = ?, lname = ?, sex = ?, address = ?, age = ?, super_ssn = ? " +
                         "where concat_ws(' ', fname, lname) = '" + name+"'");
 
                 preparedStatement.setString(1,employee.getFirst_name());
@@ -550,7 +552,15 @@ public class Storage {
                 else
                     preparedStatement.setString(6,null);
 
-                preparedStatement.setInt(7,store_id);
+                preparedStatement.executeUpdate();
+
+
+                resultSet = statement.executeQuery("select ssn from employee where concat_ws(' ', fname, lname) = " +
+                        "'"+employee.getFirst_name()+" "+employee.getLast_name()+"'");
+                resultSet.next();
+                preparedStatement = connection.prepareStatement("update works_at set store_id = ? where ssn = ?");
+                preparedStatement.setInt(1,store_id);
+                preparedStatement.setInt(2, resultSet.getInt(1));
                 preparedStatement.executeUpdate();
 
             }else{
@@ -558,7 +568,7 @@ public class Storage {
                         "'"+employee.getSuper_Name()+"'");
 
                 preparedStatement = connection.prepareStatement("insert into employee(fname, " +
-                        "lname, sex, address, age, super_ssn, works_at, ssn) values (?,?,?,?,?,?,?,?)");
+                        "lname, sex, address, age, super_ssn, ssn) values (?,?,?,?,?,?,?)");
                 preparedStatement.setString(1,employee.getFirst_name());
                 preparedStatement.setString(2,employee.getLast_name());
                 preparedStatement.setString(3,employee.getSex().charAt(0)+"");
@@ -570,8 +580,12 @@ public class Storage {
                 else
                     preparedStatement.setString(6,null);
 
-                preparedStatement.setInt(7,store_id);
-                preparedStatement.setInt(8,employee.getSsn());
+                preparedStatement.setInt(7,employee.getSsn());
+                preparedStatement.executeUpdate();
+
+                preparedStatement = connection.prepareStatement("insert into works_at (store_id, ssn) values(?,?)");
+                preparedStatement.setInt(1,store_id);
+                preparedStatement.setInt(2, employee.getSsn());
                 preparedStatement.executeUpdate();
             }
 

@@ -53,9 +53,13 @@ public class AddEmployee implements DisplayInterface{
         pane.add(submit, 2 , 4);
 
         submit.setOnAction(e->{
-            Employee employee = new Employee(Integer.parseInt(ssn.getText()), super_name.getText() ,first_name.getText(),
+            Employee employee = new Employee(super_name.getText(), first_name.getText(),
                     last_name.getText(), address.getText(), sex.getSelectionModel().getSelectedItem(),
                     Integer.parseInt(age.getText()), store.getText());
+
+            if(isNumber(ssn.getText())) {
+                employee.setSSN(ssn.getText());
+            }
 
             controller.addData(employee, Display.EMPLOYEE);
         });
@@ -74,5 +78,21 @@ public class AddEmployee implements DisplayInterface{
         this.super_name.setText(employee.getSuper_Name());
         this.age.setText(employee.getAge()+"");
         this.store.setText(employee.getStore());
+    }
+
+    private boolean isNumber(String s){
+
+        char a;
+        int c = 0;
+
+        for(int i = 0; i < s.length(); i++){
+
+            a = s.charAt(i);
+
+            if(!Character.isDigit(a))
+                c++;
+        }
+
+        return c <= 0 && s.length() != 0;
     }
 }
