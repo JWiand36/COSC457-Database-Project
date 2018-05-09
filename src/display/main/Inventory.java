@@ -1,6 +1,7 @@
 package display.main;
 
 import javafx.scene.control.Label;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
@@ -28,6 +29,10 @@ public class Inventory implements DisplayInterface {
         this.pane.add(description,1,1);
         this.pane.add(amt,1,2);
         this.pane.add(price,1,3);
+
+        pane.getColumnConstraints().add(new ColumnConstraints(200));
+        pane.setHgap(5);
+        pane.setVgap(5);
     }
 
     public void displayOne(Product product){

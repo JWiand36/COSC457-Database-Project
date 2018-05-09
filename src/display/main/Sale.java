@@ -1,6 +1,7 @@
 package display.main;
 
 import javafx.scene.control.Label;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
@@ -34,6 +35,10 @@ public class Sale implements DisplayInterface {
         this.pane.add(customer,1,2);
         this.pane.add(product,1,3);
         this.pane.add(total,1,4);
+
+        pane.getColumnConstraints().add(new ColumnConstraints(200));
+        pane.setHgap(5);
+        pane.setVgap(5);
     }
 
     public void displayOne(Receipt receipt){

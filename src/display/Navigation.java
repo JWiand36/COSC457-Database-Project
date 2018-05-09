@@ -18,8 +18,13 @@ public class Navigation {
         Menu customer = new Menu("",display.makeMenuItem("Customer"));
         Menu sale = new Menu("", display.makeMenuItem("Previous Sales"));
         Menu new_sales = new Menu("", display.makeMenuItem("New Sale"));
+        Menu events = new Menu("", display.makeMenuItem("Events"));
+        Menu promos = new Menu("", display.makeMenuItem("Promotions"));
+        Menu order = new Menu("", display.makeMenuItem("Orders"));
+        Menu addorder = new Menu("", display.makeMenuItem("Make Order"));
+        Menu ship = new Menu("", display.makeMenuItem("Shipment"));
 
-        bar = new MenuBar(new_sales, customer, sale);
+        bar = new MenuBar(new_sales, sale, customer, events, promos, order, addorder, ship);
     }
 
     public MenuBar displayNav(boolean manager){

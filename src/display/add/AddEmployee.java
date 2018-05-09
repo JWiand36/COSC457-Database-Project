@@ -5,6 +5,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import services.Controller;
@@ -49,6 +50,10 @@ public class AddEmployee implements DisplayInterface{
         pane.add(super_name,3,2);
         pane.add(age,1,3);
         pane.add(store,3,3);
+
+        pane.getColumnConstraints().add(new ColumnConstraints(200));
+        pane.setHgap(5);
+        pane.setVgap(5);
 
         pane.add(submit, 2 , 4);
 

@@ -5,6 +5,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import services.Controller;
@@ -37,6 +38,10 @@ public class AddCustomer implements DisplayInterface{
         pane.add(sex,3,1);
 
         pane.add(submit, 2,2);
+
+        pane.getColumnConstraints().add(new ColumnConstraints(200));
+        pane.setHgap(5);
+        pane.setVgap(5);
 
         submit.setOnAction(e->{
             Customer customer = new Customer(first_name.getText(), last_name.getText(),

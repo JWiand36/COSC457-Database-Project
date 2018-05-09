@@ -31,7 +31,7 @@ public class Controller {
     }
 
     //Transfers a list of data for the side bar.
-    ArrayList<String> getData(int n){
+    public ArrayList<String> getData(int n){
         return storage.getData(n);
     }
 
@@ -42,6 +42,7 @@ public class Controller {
     ArrayList<String> getStores(){ return storage.getStore(); }
 
     public String getOneStore(){ return storage.getOneStore(); }
+
 
     //determine's if the login is correct.
     public boolean isEmployee(String user, String pass){

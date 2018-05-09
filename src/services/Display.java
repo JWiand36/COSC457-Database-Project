@@ -26,12 +26,20 @@ public class Display {
     private Employee employee;
     private Inventory inventory;
     private Sale sale;
+    private EventPane eventPane;
+    private OrdersPane ordersPane;
+    private PromotionalPane promoPane;
+    private ShipmentPane shipmentPane;
 
     //The 4 add panes
     private AddCustomer add_customer;
     private AddProduct add_product;
     private AddEmployee add_employee;
     private AddSale add_sale;
+    private AddEvent add_event;
+    private AddOrder add_order;
+    private AddPromotion add_promo;
+    private AddShipment add_shipment;
 
     //Navigation and the List on the side
     private Navigation nav;
@@ -51,6 +59,11 @@ public class Display {
     static final int ADD_SALE = 5;
     public static final int WARHOUSE = 6;
     public static final int VENDOR = 7;
+    public static final int EVENT = 8;
+    public static final int PROMOTION = 9;
+    public static final int SHIPMENT = 10;
+    public static final int ORDER = 11;
+    public static final int ADDORDER = 12;
 
     public Display(BorderPane main){
         this.main = main;
@@ -65,11 +78,17 @@ public class Display {
         this.employee = new Employee();
         this.inventory = new Inventory();
         this.sale = new Sale();
+        this.eventPane = new EventPane();
+        this.promoPane = new PromotionalPane();
+        this.ordersPane = new OrdersPane();
 
         this.add_customer = new AddCustomer(controller);
         this.add_employee = new AddEmployee(controller);
         this.add_product = new AddProduct(controller, this);
         this.add_sale = new AddSale(controller);
+        this.add_event = new AddEvent(controller);
+        this.add_promo = new AddPromotion(controller);
+        this.add_order = new AddOrder(controller);
 
         this.nav = new Navigation(this);
         this.side = new SideBar(this);
@@ -145,8 +164,23 @@ public class Display {
             case "Employee":
                 item.setOnMouseClicked(e-> this.display(employee, add_employee, EMPLOYEE));
                 break;
+            case "Events":
+                item.setOnMouseClicked(e-> this.display(eventPane, add_event, EVENT));
+                break;
+            case "Orders":
+                item.setOnMouseClicked(e-> this.display(ordersPane, null, ORDER));
+                break;
+            case "Make Order":
+                item.setOnMouseClicked(e-> this.display(add_order, null, ADDORDER));
+                break;
+            case "Promotions":
+                item.setOnMouseClicked(e-> this.display(promoPane, add_promo, PROMOTION));
+                break;
             case "New Sale":
                 item.setOnMouseClicked(e-> this.display(add_sale, null, ADD_SALE));
+                break;
+            case "Shipment":
+                item.setOnMouseClicked(e-> this.display(shipmentPane, add_shipment, SHIPMENT));
                 break;
         }
 
@@ -174,6 +208,14 @@ public class Display {
             add_employee.displayOne((structures.Employee) obj);
         }else if(current_pane == ADD_SALE){
             add_sale.displayOne((structures.Product) obj);
+        }else if(current_pane == EVENT){
+            eventPane.displayOne((structures.Event) obj);
+            add_event.displayOne((structures.Event) obj);
+        }else if(current_pane == PROMOTION){
+            promoPane.displayOne((structures.Promotion) obj);
+            add_promo.displayOne((structures.Promotion) obj);
+        }else if(current_pane == ADDORDER){
+            add_order.displayOne((structures.Product) obj);
         }
 
     }

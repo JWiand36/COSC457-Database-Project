@@ -15,7 +15,6 @@ import static services.Display.*;
 
 public class Storage {
 
-    private DataInterface item;
     private int store_id = 1;
     private String store_location = "Towson";
     private String employeeName;
@@ -72,15 +71,25 @@ public class Storage {
     DataInterface getOne(String data, int location){
 
         if(location == CUSTOMERS){
-            return item = getCustomer(data);
+            return getCustomer(data);
         }else if(location == SALES){
-            return item = getReceipt(data);
+            return getReceipt(data);
         }else if(location == INVENTORY){
-            return item = getProduct(data);
+            return getProduct(data);
         }else if(location == EMPLOYEE){
-            return item = getEmployee(data);
+            return getEmployee(data);
         }else if(location == ADD_SALE){
-            return item = getProduct(data);
+            return getProduct(data);
+        }else if(location == EVENT) {
+            return getEvent(data);
+        }else if(location == PROMOTION){
+            return getPromotion(data);
+        }else if(location == SHIPMENT){
+            return getOrder(data);
+        }else if(location == ORDER) {
+            return getOrder(data);
+        }else if(location == ADDORDER){
+            return getProduct(data);
         }else
             return null;
     }
@@ -95,6 +104,14 @@ public class Storage {
             addProduct((Product) data);
         }else if(current_pane == EMPLOYEE){
             addEmployee((Employee) data);
+        }else if(current_pane == EVENT){
+            addEvent((Event) data);
+        }else if(current_pane == PROMOTION){
+            addPromotion((Promotion) data);
+        }else if(current_pane == ADDORDER){
+            addOrder((Order) data);
+        }else if(current_pane == SHIPMENT){
+            editOrder((Order) data);
         }
     }
 
@@ -163,6 +180,32 @@ public class Storage {
                         "and works_at.ssn = employee.ssn " +
                         "and store.location = \""+ store_location +"\";");
             } else if (n == ADD_SALE) {
+                resultSet = statement.executeQuery("select Name from products " +
+                        "where products.p_id in " +
+                        "(select p_id " +
+                        "from has, store " +
+                        "where has.store_id = store.store_id " +
+                        "and store.location = \""+ store_location +"\");");
+            } else if (n == EVENT){
+                resultSet = statement.executeQuery("select concat_ws(' ',events.event_id, events.name) as name from events " +
+                        "where events.event_id in " +
+                        "(select event_id " +
+                        "from take_place, store " +
+                        "where take_place.store_id = store.store_id " +
+                        "and store.location = \""+ store_location +"\");");
+            } else if (n == PROMOTION){
+                resultSet = statement.executeQuery("select concat_ws(' ',promotions.promo_id, products.name) as name " +
+                        "from promotions, products, promoted " +
+                        "where products.P_id = promoted.P_id " +
+                        "and promotions.promo_id = promoted.promo_id;");
+            } else if (n == SHIPMENT){
+
+            }else if (n == ORDER){
+                resultSet = statement.executeQuery("select concat_ws(' ',promotions.promo_id, products.name) as name " +
+                        "from promotions, products, promoted " +
+                        "where products.P_id = promoted.P_id " +
+                        "and promotions.promo_id = promoted.promo_id;");
+            } else if (n == ADDORDER) {
                 resultSet = statement.executeQuery("select Name from products " +
                         "where products.p_id in " +
                         "(select p_id " +
@@ -375,6 +418,66 @@ public class Storage {
 
 
         return employee;
+    }
+
+    private Event getEvent(String data){ //Event_Id Name
+
+
+        Event event;
+
+        try{
+
+            resultSet = statement.executeQuery("select events.event_id, events.name, events.host_name, events.date " +
+                    "from events " +
+                    "where concat_ws(' ', events.event_id, events.name) = \"" + data + "\";");
+
+            resultSet.next();
+            int id = resultSet.getInt(1);
+            String name = resultSet.getString(2);
+            String host = resultSet.getString(3);
+            String date = resultSet.getString(4);
+
+            event = new Event(id, name, date, host);
+        }catch (SQLException ex){
+            ex.printStackTrace();
+            event = new Event();
+        }
+
+
+        return event;
+
+    }
+
+    private Promotion getPromotion(String data){
+        Promotion promotion;
+
+        try{
+
+            resultSet = statement.executeQuery("select promotions.promo_id, products.name, promotions.discount, promotions.date " +
+                    "from promotions, products, promoted " +
+                    "where concat_ws(' ', promotions.promo_id, products.name) = \"" + data + "\" " +
+                    "and promotions.promo_id = promoted.promo_id " +
+                    "and products.P_id = promoted.P_id;");
+
+            resultSet.next();
+            int id = resultSet.getInt(1);
+            String item = resultSet.getString(2);
+            double discount = resultSet.getDouble(3);
+            String date = resultSet.getString(4);
+
+            promotion = new Promotion(id, item, discount,date);
+        }catch (SQLException ex){
+            ex.printStackTrace();
+            promotion = new Promotion();
+        }
+
+
+        return promotion;
+    }
+
+    private Order getOrder(String data){
+        System.out.println("Get Order");
+        return new Order();
     }
 
     private void addCustomer(Customer customer){
@@ -611,5 +714,117 @@ public class Storage {
                     "where name = '"+product.getName()+"';" );
             preparedStatement.executeUpdate();
         }catch (SQLException ex){ex.printStackTrace();}
+    }
+
+    private void addEvent(Event event){
+        try{
+            resultSet = statement.executeQuery("select event_id from events " +
+                    "where events.name = '" + event.getName()+"' "+
+                    "and events.date = '" +event.getDate()+"';");
+
+            if(resultSet.next()){
+                String id = resultSet.getString(1);
+
+                preparedStatement = connection.prepareStatement("update events " +
+                        "set name = ?, host_name = ?, date = ? " +
+                        "where event_id = '" + id +"'");
+
+                preparedStatement.setString(1,event.getName());
+                preparedStatement.setString(2,event.getHost());
+                preparedStatement.setString(3,event.getDate());
+
+                preparedStatement.executeUpdate();
+
+            }else{
+                preparedStatement = connection.prepareStatement("insert into events(name, " +
+                        "host_name, date) values (?,?,?)");
+                preparedStatement.setString(1,event.getName());
+                preparedStatement.setString(2,event.getHost());
+                preparedStatement.setString(3,event.getDate());
+                preparedStatement.executeUpdate();
+
+                resultSet = statement.executeQuery("select event_id from events where name = '"+event.getName()+"';");
+                resultSet.next();
+
+
+                preparedStatement = connection.prepareStatement("insert into take_place (store_id, event_id) values(?,?)");
+                preparedStatement.setInt(1,store_id);
+                preparedStatement.setInt(2, resultSet.getInt(1));
+                preparedStatement.executeUpdate();
+            }
+
+        }catch (SQLException ex){ ex.printStackTrace(); }
+
+
+    }
+
+    private void addPromotion(Promotion promotion){
+        try{
+            resultSet = statement.executeQuery("select promo_id from promotions " +
+                    "where promotions.promo_id = '" + promotion.getId()+"';");
+
+            if(resultSet.next()){
+                int id = resultSet.getInt(1);
+
+                preparedStatement = connection.prepareStatement("update promotions " +
+                        "set discount = ?, date = ? " +
+                        "where promo_id = '" + id +"'");
+
+                preparedStatement.setDouble(1,promotion.getDiscount());
+                preparedStatement.setString(2,promotion.getDate());
+
+                preparedStatement.executeUpdate();
+
+                resultSet = statement.executeQuery("select products.P_id " +
+                        "from products " +
+                        "where products.name = \"" + promotion.getItem() +"\";");
+
+                resultSet.next();
+
+                int pId = resultSet.getInt(1);
+
+                preparedStatement = connection.prepareStatement("update promoted " +
+                        "set p_id = ? " +
+                        "where promo_id = '" + id +"'");
+
+                preparedStatement.setInt(1,pId);
+
+                preparedStatement.executeUpdate();
+
+            }else{
+                preparedStatement = connection.prepareStatement("insert into promotions(discount, " +
+                        " date) values (?,?)");
+                preparedStatement.setDouble(1,promotion.getDiscount());
+                preparedStatement.setString(2,promotion.getDate());
+                preparedStatement.executeUpdate();
+
+                resultSet = statement.executeQuery("select promo_id from promotions where discount = '"+promotion.getDiscount()+"' " +
+                        "and date = '"+ promotion.getDate()+"';");
+                resultSet.next();
+
+                int id = resultSet.getInt(1);
+
+                resultSet = statement.executeQuery("select p_id from products where name = '"+promotion.getItem()+"';");
+                resultSet.next();
+
+                int pid = resultSet.getInt(1);
+
+                preparedStatement = connection.prepareStatement("insert into promoted (p_id, promo_id) values(?,?)");
+                preparedStatement.setInt(1,pid);
+                preparedStatement.setInt(2,id);
+                preparedStatement.executeUpdate();
+            }
+
+        }catch (SQLException ex){ ex.printStackTrace(); }
+
+
+    }
+
+    private void addOrder(Order order){
+        System.out.println("Add Order");
+    }
+
+    private void editOrder(Order order){
+        System.out.println("Edit Order");
     }
 }

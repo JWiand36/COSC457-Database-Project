@@ -6,6 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import services.Controller;
@@ -47,6 +48,10 @@ public class AddProduct implements DisplayInterface{
         pane.add(warehouse, 2, 3);
         pane.add(vendor, 3, 3);
         pane.add(submit, 0,4);
+
+        pane.getColumnConstraints().add(new ColumnConstraints(200));
+        pane.setHgap(5);
+        pane.setVgap(5);
 
 
         submit.setOnAction(e->{

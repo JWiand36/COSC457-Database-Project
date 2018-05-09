@@ -1,6 +1,7 @@
 package display.main;
 
 import javafx.scene.control.Label;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
@@ -33,6 +34,10 @@ public class Employee implements DisplayInterface {
         this.pane.add(age,1,3);
         this.pane.add(super_name,1,4);
         this.pane.add(store,1,5);
+
+        pane.getColumnConstraints().add(new ColumnConstraints(200));
+        pane.setHgap(5);
+        pane.setVgap(5);
 
     }
 

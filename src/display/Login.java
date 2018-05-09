@@ -22,6 +22,8 @@ public class Login implements DisplayInterface {
         this.controller = controller;
         flow = new FlowPane();
 
+        flow.setHgap(5);
+
         initLogin();
     }
 

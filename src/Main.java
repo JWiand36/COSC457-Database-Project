@@ -20,8 +20,8 @@ public class Main extends Application {
 
         new Controller(display, storage);
 
-        primaryStage.setTitle("Hello World");
-        primaryStage.setScene(new Scene(root, 300, 275));
+        primaryStage.setTitle("Retail System");
+        primaryStage.setScene(new Scene(root, 950, 400));
         primaryStage.show();
     }
 

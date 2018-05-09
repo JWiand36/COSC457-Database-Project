@@ -4,8 +4,8 @@ import display.main.DisplayInterface;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import services.Controller;
 import services.Display;
@@ -19,7 +19,7 @@ public class AddSale implements DisplayInterface{
 
     private Controller controller;
 
-    private FlowPane pane;
+    private VBox pane;
 
     private ArrayList<Product> products = new ArrayList<>();
     private ArrayList<Button> buttons = new ArrayList<>();
@@ -32,7 +32,7 @@ public class AddSale implements DisplayInterface{
 
     public AddSale(Controller controller){
 
-        this.pane = new FlowPane();
+        this.pane = new VBox(5);
 
         this.controller = controller;
 
@@ -41,6 +41,8 @@ public class AddSale implements DisplayInterface{
 
             controller.addData(receipt, Display.SALES);
         });
+
+        customer.setMaxWidth(200);
 
         buildPane(pane);
     }
@@ -80,16 +82,16 @@ public class AddSale implements DisplayInterface{
     private String addTotal(double amount){
         double temp = Double.parseDouble(total.getText());
         temp += amount;
-        return temp +"";
+        return String.format("%1$.2f",temp);
     }
 
     private String subTotal(double amount){
         double temp = Double.parseDouble(total.getText());
         temp -= amount;
-        return temp +"";
+        return String.format("%1$.2f",temp);
     }
 
-    private void buildPane(FlowPane pane){
+    private void buildPane(VBox pane){
         pane.getChildren().clear();
 
         this.pane.getChildren().addAll(new Label("Customer Name: "),customer,new Label("Products: "));

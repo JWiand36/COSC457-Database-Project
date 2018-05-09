@@ -2,6 +2,7 @@ package display.main;
 
 
 import javafx.scene.control.Label;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
@@ -27,6 +28,10 @@ public class Customer implements DisplayInterface {
         this.pane.add(address,1,1);
         this.pane.add(sex,1,2);
         this.pane.add(balance,1,3);
+
+        pane.getColumnConstraints().add(new ColumnConstraints(200));
+        pane.setHgap(5);
+        pane.setVgap(5);
     }
 
     public void displayOne(structures.Customer customer){
