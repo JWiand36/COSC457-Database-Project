@@ -199,12 +199,15 @@ public class Storage {
                         "where products.P_id = promoted.P_id " +
                         "and promotions.promo_id = promoted.promo_id;");
             } else if (n == SHIPMENT){
-
+                resultSet = statement.executeQuery("select concat_ws(' ',orders.o_id, shipment.shipping_address) as name " +
+                        "from orders, shipment, ship " +
+                        "where orders.o_id = ship.o_id " +
+                        "and shipment.shipment_id = ship.shipment_id;");
             }else if (n == ORDER){
-                resultSet = statement.executeQuery("select concat_ws(' ',promotions.promo_id, products.name) as name " +
-                        "from promotions, products, promoted " +
-                        "where products.P_id = promoted.P_id " +
-                        "and promotions.promo_id = promoted.promo_id;");
+                resultSet = statement.executeQuery("select concat_ws(' ',orders.o_id, shipment.shipping_address) as name " +
+                        "from orders, shipment, ship " +
+                        "where orders.o_id = ship.o_id " +
+                        "and shipment.shipment_id = ship.shipment_id;");
             } else if (n == ADDORDER) {
                 resultSet = statement.executeQuery("select Name from products " +
                         "where products.p_id in " +
@@ -212,6 +215,8 @@ public class Storage {
                         "from has, store " +
                         "where has.store_id = store.store_id " +
                         "and store.location = \""+ store_location +"\");");
+            }else if (n == 13){ //Gets the shipping Companies
+                resultSet = statement.executeQuery("select Name from shipping_company;");
             }
 
             int i = 1;
@@ -476,8 +481,80 @@ public class Storage {
     }
 
     private Order getOrder(String data){
-        System.out.println("Get Order");
-        return new Order();
+
+        Order order;
+
+        try {
+            Company company = new Company(0,"",0);
+            ArrayList<Product> products = new ArrayList<>();
+            int id = 0;
+            String customer = "";
+            int confirmNum = 0;
+            int companyId = 0;
+            String company_name;
+            String address = "";
+            double cost = 0;
+            double shippingCost = 0;
+
+            resultSet = statement.executeQuery("select orders.o_id, shipment.shipping_address, invoice.cost, concat_ws(' ', customer.fname, customer.lname) " +
+                    "from orders, invoice, shipment, processed, ship, customer, ordered " +
+                    "where concat_ws(' ', orders.o_id, shipment.shipping_address) = \"" + data + "\" " +
+                    "and orders.o_id = ship.o_id " +
+                    "and shipment.shipment_id = ship.shipment_id " +
+                    "and invoice.invoice_id = processed.invoice_id " +
+                    "and orders.o_id = ordered.o_id " +
+                    "and customer.c_id = ordered.c_id;");
+
+            resultSet.next();
+
+            id = resultSet.getInt(1);
+            address = resultSet.getString(2);
+            cost = resultSet.getDouble(3);
+            customer = resultSet.getString(4);
+
+            resultSet = statement.executeQuery("select shipment.confirm_Num, shipping_Company.name, shipping_company.price, " +
+                    "shipping_Company.company_id " +
+                    "from orders, shipping_company, shipment, shipping, ship " +
+                    "where orders.o_id = " + id + " " +
+                    "and orders.o_id = ship.o_id " +
+                    "and shipment.shipment_id = ship.shipment_id " +
+                    "and shipment.shipment_id = shipping.shipment_id " +
+                    "and shipping_company.company_id = shipping.company_id;");
+
+            if(resultSet.next()) {
+                confirmNum = resultSet.getInt(1);
+                company_name = resultSet.getString(2);
+                shippingCost = resultSet.getDouble(3);
+                companyId = resultSet.getInt(4);
+                company = new Company(companyId, company_name, shippingCost);
+            }
+
+            resultSet = statement.executeQuery("select products.p_id, products.name, products.description, products.amt_left, products.price " +
+                    "from orders, processed, invoice, ordered_items, products " +
+                    "where orders.o_id = " + id + " " +
+                    "and orders.o_id = processed.o_id " +
+                    "and invoice.invoice_id = processed.invoice_id " +
+                    "and ordered_items.invoice_id = invoice.invoice_id " +
+                    "and ordered_items.p_id = products.p_id;");
+
+            while (resultSet.next()) {
+                int pId = resultSet.getInt(1);
+                String pName = resultSet.getString(2);
+                String pDescription = resultSet.getString(3);
+                int pAmt = resultSet.getInt(4);
+                double pPrice = resultSet.getDouble(5);
+
+                products.add(new Product(pId, pName, pDescription, pAmt, pPrice));
+            }
+
+            order = new Order(id, customer, confirmNum, cost, products, address, company);
+
+        }catch (SQLException ex){
+            ex.printStackTrace();
+            order = new Order();
+        }
+
+        return order;
     }
 
     private void addCustomer(Customer customer){
@@ -818,13 +895,113 @@ public class Storage {
         }catch (SQLException ex){ ex.printStackTrace(); }
 
 
+
     }
 
     private void addOrder(Order order){
-        System.out.println("Add Order");
+        int id = 0;
+        int pId = 0;
+        int invoiceId = 0;
+        int customerId = 0;
+        int shipmentId = 0;
+
+        try {
+
+            preparedStatement = connection.prepareStatement("insert into orders() values ()");
+            preparedStatement.executeUpdate();
+
+            resultSet = statement.executeQuery("select Max(o_id) from orders;");
+            resultSet.next();
+
+            id = resultSet.getInt(1);
+
+            preparedStatement = connection.prepareStatement("insert into invoice(cost) values (?)");
+            preparedStatement.setDouble(1, order.getCost());
+            preparedStatement.executeUpdate();
+
+            resultSet = statement.executeQuery("select Max(invoice_id) from invoice;");
+            resultSet.next();
+
+            invoiceId = resultSet.getInt(1);
+
+            preparedStatement = connection.prepareStatement("insert into processed(invoice_id, o_id) values (?,?)");
+            preparedStatement.setInt(1, invoiceId);
+            preparedStatement.setInt(2, id);
+            preparedStatement.executeUpdate();
+
+            for(Product product: order.getProducts()) {
+                resultSet = statement.executeQuery("select products.p_id " +
+                        "from products " +
+                        "where name = \"" + product.getName() + "\";");
+                resultSet.next();
+
+                pId = resultSet.getInt(1);
+
+                preparedStatement = connection.prepareStatement("insert into ordered_items(p_id, invoice_id) " +
+                        "value(?,?);");
+                preparedStatement.setInt(1,pId);
+                preparedStatement.setInt(2,invoiceId);
+                preparedStatement.executeUpdate();
+            }
+
+            resultSet = statement.executeQuery("select c_id " +
+                    "from customer " +
+                    "where concat_ws(' ', fname, lname) = \""+order.getCustomer()+"\";");
+            resultSet.next();
+            customerId = resultSet.getInt(1);
+
+            preparedStatement = connection.prepareStatement("insert into ordered(c_id, o_id) values (?,?)");
+            preparedStatement.setInt(1, customerId);
+            preparedStatement.setInt(2, id);
+            preparedStatement.executeUpdate();
+
+            preparedStatement = connection.prepareStatement("insert into shipment(shipping_address, confirm_Num) values (?,?)");
+            preparedStatement.setString(1, order.getShipping_Address());
+            preparedStatement.setInt(2,0);
+            preparedStatement.executeUpdate();
+
+            resultSet = statement.executeQuery("select Max(shipment_id) from shipment;");
+            resultSet.next();
+
+            shipmentId = resultSet.getInt(1);
+
+            preparedStatement = connection.prepareStatement("insert into ship(shipment_id, o_id) values (?,?)");
+            preparedStatement.setInt(1, shipmentId);
+            preparedStatement.setInt(2, id);
+            preparedStatement.executeUpdate();
+
+        }catch (SQLException ex){ ex.printStackTrace(); }
+
     }
 
     private void editOrder(Order order){
-        System.out.println("Edit Order");
+
+
+    }
+
+    Company getOneCompany(String data){
+        Company company = new Company(0,"",0);
+
+        int companyId = 0;
+        String company_name = "";
+        double shippingCost = 0;
+        try {
+
+            resultSet = statement.executeQuery("select shipping_Company.name, shipping_company.price, " +
+                    "shipping_Company.company_id " +
+                    "from shipping_company " +
+                    "where shipping_company.name = \"" + data + "\";");
+
+            if (resultSet.next()) {
+
+                company_name = resultSet.getString(1);
+                shippingCost = resultSet.getDouble(2);
+                companyId = resultSet.getInt(3);
+
+                company = new Company(companyId, company_name, shippingCost);
+            }
+        }catch(SQLException ex){ex.printStackTrace();}
+
+        return company;
     }
 }

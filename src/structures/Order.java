@@ -5,48 +5,48 @@ import java.util.ArrayList;
 public class Order implements DataInterface {
 
     private int id;
+    private String customer;
     private int confirmNumber;
     private double cost;
-    private double shipping_Cost;
     private ArrayList<Product> products;
     private String shipping_Address;
-    private String shipping_Company;
+    private Company company;
 
     public Order(){
         this.id = 0;
+        this.customer = "";
         this.confirmNumber = 0;
         this.cost = 0;
-        this.shipping_Cost = 0;
         this.products = new ArrayList<>();
         this.shipping_Address = "";
-        this.shipping_Company = "";
+        this.company = new Company(0,"",0);
     }
 
-    public Order(int id, int confirmNumber, double cost, double shipping_Cost, ArrayList<Product> products, String shipping_Address, String shipping_Company) {
+    public Order(int id, String customer, int confirmNumber, double cost, ArrayList<Product> products, String shipping_Address, Company company) {
         this.id = id;
+        this.customer = customer;
         this.confirmNumber = confirmNumber;
         this.cost = cost;
-        this.shipping_Cost = shipping_Cost;
         this.products = products;
         this.shipping_Address = shipping_Address;
-        this.shipping_Company = shipping_Company;
+        this.company = company;
     }
 
-    public Order(double cost, String shipping_Address, ArrayList<Product> products) {
+    public Order(String customer, double cost, String shipping_Address, ArrayList<Product> products) {
         this.confirmNumber = confirmNumber;
+        this.customer = customer;
         this.cost = cost;
         this.shipping_Address = shipping_Address;
         this.products = products;
-        this.shipping_Cost = 0;
-        this.shipping_Company = "";
+        this.company = new Company(0,"",0);
     }
 
-    public void setShipping_Cost(double shipping_Cost) {
-        this.shipping_Cost = shipping_Cost;
+    public String getCustomer() {
+        return customer;
     }
 
-    public void setShipping_Company(String shipping_Company) {
-        this.shipping_Company = shipping_Company;
+    public void setCompany(Company company) {
+        this.company = company;
     }
 
     public int getId() {
@@ -62,7 +62,7 @@ public class Order implements DataInterface {
     }
 
     public double getShipping_Cost() {
-        return shipping_Cost;
+        return company.getCost();
     }
 
     public ArrayList<Product> getProducts() {
@@ -74,6 +74,6 @@ public class Order implements DataInterface {
     }
 
     public String getShipping_Company() {
-        return shipping_Company;
+        return company.getName();
     }
 }

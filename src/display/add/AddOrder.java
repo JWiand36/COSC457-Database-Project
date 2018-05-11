@@ -1,7 +1,9 @@
 package display.add;
 
 import display.main.DisplayInterface;
+import javafx.collections.FXCollections;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
@@ -19,37 +21,31 @@ import java.util.Date;
 public class AddOrder implements DisplayInterface{
 
     private Controller controller;
-
     private VBox pane;
-
     private ArrayList<Product> products = new ArrayList<>();
     private ArrayList<Button> buttons = new ArrayList<>();
-
     private Button submit = new Button("Submit");
-
     private TextField shippingAddress = new TextField();
-
+    private ComboBox<String> customer = new ComboBox<>();
     private Text total = new Text(0+"");
 
     public AddOrder(Controller controller){
 
         this.pane = new VBox(5);
-
         this.controller = controller;
 
         submit.setOnAction(e->{
-            Order order = new Order(Double.parseDouble(total.getText()), shippingAddress.getText(), products);
+            String selectCutomer = customer.getSelectionModel().getSelectedItem();
+            Order order = new Order(selectCutomer, Double.parseDouble(total.getText()), shippingAddress.getText(), products);
             controller.addData(order, Display.ADDORDER);
         });
 
         shippingAddress.setMaxWidth(250);
-
         buildPane(pane);
     }
 
     public void displayOne(Product product){
         products.add(product);
-
         Button button = new Button("Remove");
 
         button.setOnAction(e->{
@@ -64,9 +60,7 @@ public class AddOrder implements DisplayInterface{
         });
 
         buttons.add(button);
-
         buildPane(pane);
-
         total.setText(addTotal(product.getPrice()));
     }
 
@@ -94,11 +88,15 @@ public class AddOrder implements DisplayInterface{
     private void buildPane(VBox pane){
         pane.getChildren().clear();
 
-        this.pane.getChildren().addAll(new Label("Shipping Address: "),shippingAddress,new Label("Products: "));
+        this.pane.getChildren().addAll(new Label("Customer: "), customer, new Label("Shipping Address: "),shippingAddress,new Label("Products: "));
 
         for( int i = 0; i < products.size(); i++)
             this.pane.getChildren().addAll(new Text(products.get(i).toString()),buttons.get(i));
 
         this.pane.getChildren().addAll(new Label("Total Cost: "),total,submit);
+    }
+
+    public void setInfo(ArrayList<String> list){
+        customer.setItems(FXCollections.observableArrayList(list));
     }
 }

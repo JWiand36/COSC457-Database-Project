@@ -1,13 +1,11 @@
 package services;
 
-import structures.Customer;
+import structures.Company;
 import structures.DataInterface;
-import structures.Employee;
 import structures.Product;
 
 import java.util.ArrayList;
 
-import static services.Display.*;
 
 /*
  This class deals with any type of data transfer. If data is being transferred to the display, the controller will
@@ -72,5 +70,9 @@ public class Controller {
     private void initDisplay(){
         this.display.addController(this);
         this.display.initDisplay();
+    }
+
+    public Company getOneCompany(String data){
+        return storage.getOneCompany(data);
     }
 }

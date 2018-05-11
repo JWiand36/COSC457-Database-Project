@@ -63,6 +63,10 @@ public class AddPromotion implements DisplayInterface {
         discountField.setText(promotion.getDiscount()+"");
     }
 
+    public void setInfo(ArrayList<String> list){
+        items.setItems(FXCollections.observableArrayList(list));
+    }
+
     @Override
     public Pane display() {
         return pane;

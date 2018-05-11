@@ -245,4 +245,13 @@ VALUES (1,45645, "Here");
 INSERT INTO ship(O_id, shipment_id)
 VALUES (1,1);
 
+INSERT INTO shipping_company(company_id, name, price)
+VALUES (1,"UPS",5.99);
+
+INSERT INTO shipping(shipment_id, company_id)
+VALUES (1,1);
+
+INSERT INTO ordered(c_id, o_id)
+VALUES (1,1);
+
 SET FOREIGN_KEY_CHECKS=1;

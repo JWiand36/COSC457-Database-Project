@@ -9,8 +9,6 @@ import structures.DataInterface;
 import structures.Product;
 import structures.Receipt;
 
-import java.util.ArrayList;
-
 /*
  This class controls anything dealing with the display. If an action takes place that involve
  with the display of the program. It will be in this class. Also if data is going to be displayed
@@ -81,6 +79,7 @@ public class Display {
         this.eventPane = new EventPane();
         this.promoPane = new PromotionalPane();
         this.ordersPane = new OrdersPane();
+        this.shipmentPane = new ShipmentPane();
 
         this.add_customer = new AddCustomer(controller);
         this.add_employee = new AddEmployee(controller);
@@ -89,6 +88,7 @@ public class Display {
         this.add_event = new AddEvent(controller);
         this.add_promo = new AddPromotion(controller);
         this.add_order = new AddOrder(controller);
+        this.add_shipment = new AddShipment(controller);
 
         this.nav = new Navigation(this);
         this.side = new SideBar(this);
@@ -214,13 +214,17 @@ public class Display {
         }else if(current_pane == PROMOTION){
             promoPane.displayOne((structures.Promotion) obj);
             add_promo.displayOne((structures.Promotion) obj);
-        }else if(current_pane == ADDORDER){
-            add_order.displayOne((structures.Product) obj);
+        }else if(current_pane == ORDER || current_pane == ADDORDER) {
+            ordersPane.displayOne((structures.Order) obj);
+        }else if(current_pane == SHIPMENT){
+            shipmentPane.displayOne((structures.Order) obj);
+            add_shipment.displayOne((structures.Order) obj);
         }
-
     }
 
     public void setInfo(){
+        add_promo.setInfo(controller.getData(INVENTORY));
+        add_order.setInfo(controller.getData(CUSTOMERS));
         side.setInfo(controller.getData(current_pane));
     }
 }

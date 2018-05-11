@@ -13,6 +13,7 @@ public class OrdersPane implements DisplayInterface{
 
     private GridPane pane = new GridPane();
 
+    private Text customerTxt = new Text();
     private Text addressField = new Text();
     private Text itemField = new Text();
     private Text costField = new Text();
@@ -22,6 +23,7 @@ public class OrdersPane implements DisplayInterface{
 
     public OrdersPane(){
 
+        Label customer = new Label("Customer: ");
         Label address = new Label("Shipping Address: ");
         Label items = new Label("Ordered Items: ");
         Label cost = new Label("Cost: ");
@@ -30,18 +32,23 @@ public class OrdersPane implements DisplayInterface{
         Label shipCost = new Label("Shipping Cost: ");
 
 
-        pane.add(address,0,0);
-        pane.add(addressField,1,0);
-        pane.add(items,0,1);
-        pane.add(itemField,1,1);
-        pane.add(cost,0,2);
-        pane.add(costField,1,2);
-        pane.add(confirmNumber,0,3);
-        pane.add(confirmField,1,3);
-        pane.add(shipCompany,0,4);
-        pane.add(companyField,1,4);
-        pane.add(shipCost,0,5);
-        pane.add(shipCostField,1,5);
+        pane.add(customer, 0,0);
+        pane.add(customerTxt,1,0);
+        pane.add(address,0,1);
+        pane.add(addressField,1,1);
+        pane.add(items,0,2);
+        pane.add(itemField,1,2);
+        pane.add(cost,0,3);
+        pane.add(costField,1,3);
+        pane.add(confirmNumber,0,4);
+        pane.add(confirmField,1,4);
+        pane.add(shipCompany,0,5);
+        pane.add(companyField,1,5);
+        pane.add(shipCost,0,6);
+        pane.add(shipCostField,1,6);
+
+        pane.setVgap(5);
+        pane.setHgap(5);
 
     }
 
@@ -49,6 +56,7 @@ public class OrdersPane implements DisplayInterface{
 
         String temp = "";
 
+        customerTxt.setText(order.getCustomer());
         addressField.setText(order.getShipping_Address());
 
         for(Product product: order.getProducts()){
@@ -56,10 +64,10 @@ public class OrdersPane implements DisplayInterface{
         }
 
         itemField.setText(temp);
-        costField.setText(order.getCost()+"");
-        confirmField.setText(order.getConfirmNumber()+"");
+        costField.setText("" + order.getCost());
+        confirmField.setText("" + order.getConfirmNumber());
         companyField.setText(order.getShipping_Company());
-        shipCostField.setText(order.getShipping_Cost()+"");
+        shipCostField.setText("" + order.getShipping_Cost());
 
 
     }
