@@ -214,8 +214,10 @@ public class Display {
         }else if(current_pane == PROMOTION){
             promoPane.displayOne((structures.Promotion) obj);
             add_promo.displayOne((structures.Promotion) obj);
-        }else if(current_pane == ORDER || current_pane == ADDORDER) {
+        }else if(current_pane == ORDER) {
             ordersPane.displayOne((structures.Order) obj);
+        }else if(current_pane == ADDORDER) {
+            add_order.displayOne((structures.Product) obj);
         }else if(current_pane == SHIPMENT){
             shipmentPane.displayOne((structures.Order) obj);
             add_shipment.displayOne((structures.Order) obj);

@@ -501,6 +501,7 @@ public class Storage {
                     "where concat_ws(' ', orders.o_id, shipment.shipping_address) = \"" + data + "\" " +
                     "and orders.o_id = ship.o_id " +
                     "and shipment.shipment_id = ship.shipment_id " +
+                    "and orders.o_id = processed.O_id " +
                     "and invoice.invoice_id = processed.invoice_id " +
                     "and orders.o_id = ordered.o_id " +
                     "and customer.c_id = ordered.c_id;");
@@ -976,7 +977,39 @@ public class Storage {
 
     private void editOrder(Order order){
 
+        System.out.println();
 
+        try {
+            int shipmentId;
+            int confirm = 0;
+
+            resultSet = statement.executeQuery("select shipment_id from ship where o_id = " + order.getId() + ";");
+            resultSet.next();
+
+            shipmentId = resultSet.getInt(1);
+
+            do {
+                confirm = (int) (Math.random() * 10000);
+
+                resultSet = statement.executeQuery("select shipment_id from shipment where confirm_num = " + confirm + ";");
+            }while(resultSet.next());
+
+
+            preparedStatement = connection.prepareStatement("update shipment " +
+                    "set confirm_num = ? " +
+                    "where shipment_id = '" + shipmentId +"'");
+            preparedStatement.setInt(1, confirm);
+            preparedStatement.executeUpdate();
+
+
+            preparedStatement = connection.prepareStatement("insert into shipping(shipment_id, company_id) values (?,?)");
+            preparedStatement.setInt(1, shipmentId);
+            preparedStatement.setInt(2, order.getCompany().getId());
+            preparedStatement.executeUpdate();
+
+        }catch(SQLException ex){
+            ex.printStackTrace();
+        }
     }
 
     Company getOneCompany(String data){

@@ -76,4 +76,6 @@ public class Order implements DataInterface {
     public String getShipping_Company() {
         return company.getName();
     }
+
+    public Company getCompany(){ return company; }
 }

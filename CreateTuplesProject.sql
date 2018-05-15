@@ -248,6 +248,12 @@ VALUES (1,1);
 INSERT INTO shipping_company(company_id, name, price)
 VALUES (1,"UPS",5.99);
 
+INSERT INTO shipping_company(company_id, name, price)
+VALUES (2,"USPS",4.99);
+
+INSERT INTO shipping_company(company_id, name, price)
+VALUES (3,"Fed-Ex",6.99);
+
 INSERT INTO shipping(shipment_id, company_id)
 VALUES (1,1);
 

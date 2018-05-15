@@ -9,6 +9,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import services.Controller;
+import services.Display;
 import structures.Company;
 import structures.Order;
 
@@ -35,7 +36,10 @@ public class AddShipment implements DisplayInterface {
             price.setText("Price: "+company.getCost());
         });
 
-        submit.setOnAction(e-> order.setCompany(company));
+        submit.setOnAction(e->{
+            order.setCompany(company);
+            controller.addData(order, Display.SHIPMENT);
+        });
 
         pane.add(shipment, 0,0);
         pane.add(companies,1,0);
