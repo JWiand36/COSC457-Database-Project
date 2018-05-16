@@ -57,18 +57,6 @@ VALUES (3,'Game of Thrones', 'Book', 15, 5.99);
 INSERT INTO products (p_id, name, description, amt_left, price) 
 VALUES (4,'Far Cry 5', 'Book', 10, 59.99);
 
-INSERT INTO sale (s_id, total_cost,date) 
-VALUES (1,15.0, 'March 3 2018');
-
-INSERT INTO sale (s_id, total_cost,date) 
-VALUES (2,120.0, 'April 16 2018');
-
-INSERT INTO sale (s_id, total_cost,date) 
-VALUES (3,30.0, 'March 28 2018');
-
-INSERT INTO sale (s_id, total_cost,date) 
-VALUES (4,45.0, 'April 10 2018');
-
 INSERT INTO store (store_id, location) 
 VALUES (1,'Towson');
 
@@ -120,39 +108,6 @@ VALUES (2,3);
 INSERT INTO has (store_id, p_id) 
 VALUES (2,4);
 
-INSERT INTO items_sold (p_id, s_id) 
-VALUES (1,1);
-
-INSERT INTO items_sold (p_id, s_id) 
-VALUES (3,1);
-
-INSERT INTO items_sold (p_id, s_id) 
-VALUES (2,2);
-
-INSERT INTO items_sold (p_id, s_id) 
-VALUES (1,3);
-
-INSERT INTO items_sold (p_id, s_id) 
-VALUES (1,4);
-
-INSERT INTO items_sold (p_id, s_id) 
-VALUES (4,4);
-
-INSERT INTO items_sold (p_id, s_id) 
-VALUES (2,4);
-
-INSERT INTO makes_sale (c_id, s_id) 
-VALUES (1,1);
-
-INSERT INTO makes_sale (c_id, s_id) 
-VALUES (2,2);
-
-INSERT INTO makes_sale (c_id, s_id) 
-VALUES (2,3);
-
-INSERT INTO makes_sale (c_id, s_id) 
-VALUES (3,4);
-
 INSERT INTO shop_at (c_id, store_id) 
 VALUES (1,1);
 
@@ -162,17 +117,8 @@ VALUES (2,2);
 INSERT INTO shop_at (c_id, store_id) 
 VALUES (3,2);
 
-INSERT INTO sold_at (s_id, store_id) 
+INSERT INTO sold_at (o_id, store_id) 
 VALUES (1,1);
-
-INSERT INTO sold_at (s_id, store_id) 
-VALUES (2,2);
-
-INSERT INTO sold_at (s_id, store_id) 
-VALUES (3,2);
-
-INSERT INTO sold_at (s_id, store_id) 
-VALUES (4,2);
 
 INSERT INTO supplies (p_id, v_id) 
 VALUES (2,1);
@@ -221,6 +167,7 @@ VALUES (1,"Nov 6", 5);
 
 INSERT INTO promoted(promo_id, P_id)
 VALUES (1,1);
+
 INSERT INTO orders(O_Id)
 VALUES (1);
 
@@ -257,7 +204,10 @@ VALUES (3,"Fed-Ex",6.99);
 INSERT INTO shipping(shipment_id, company_id)
 VALUES (1,1);
 
-INSERT INTO ordered(c_id, o_id)
-VALUES (1,1);
+INSERT INTO credit_card(credit_id, name, credit_num)
+VALUES (1, "Brad Smoke", 123456);
+
+INSERT INTO paid_with(credit_id, o_id)
+VALUES (1, 1);
 
 SET FOREIGN_KEY_CHECKS=1;

@@ -21,7 +21,7 @@ public class Main extends Application {
         new Controller(display, storage);
 
         primaryStage.setTitle("Retail System");
-        primaryStage.setScene(new Scene(root, 950, 400));
+        primaryStage.setScene(new Scene(root, 950, 700));
         primaryStage.show();
     }
 

@@ -8,6 +8,7 @@ public class Customer implements DataInterface{
     private String address;
     private String sex;
     private double balance;
+    private double pay;
 
     public Customer(){
         this.first_name = "";
@@ -26,12 +27,12 @@ public class Customer implements DataInterface{
         this.balance = Double.parseDouble(balance);
     }
 
-    public Customer(String first_name, String last_name, String address, String sex) {
+    public Customer(String first_name, String last_name, String address, String sex, double pay) {
         this.first_name = first_name;
         this.last_name = last_name;
         this.address = address;
         this.sex = sex;
-        this.balance = 0;
+        this.pay = pay;
     }
 
     public int getId(){ return id; }
@@ -55,4 +56,6 @@ public class Customer implements DataInterface{
     public double getBalance() {
         return balance;
     }
+
+    public double getPay(){ return pay; }
 }

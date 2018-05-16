@@ -17,6 +17,8 @@ public class OrdersPane implements DisplayInterface{
     private Text addressField = new Text();
     private Text itemField = new Text();
     private Text costField = new Text();
+    private Text creditNumField = new Text();
+    private Text creditNameField = new Text();
     private Text confirmField = new Text();
     private Text companyField = new Text();
     private Text shipCostField = new Text();
@@ -27,6 +29,8 @@ public class OrdersPane implements DisplayInterface{
         Label address = new Label("Shipping Address: ");
         Label items = new Label("Ordered Items: ");
         Label cost = new Label("Cost: ");
+        Label creditNum = new Label("Credit Number: ");
+        Label creditName = new Label("Name on Card: ");
         Label confirmNumber = new Label("Confirmation Number: ");
         Label shipCompany = new Label("Shipping Company: ");
         Label shipCost = new Label("Shipping Cost: ");
@@ -40,12 +44,16 @@ public class OrdersPane implements DisplayInterface{
         pane.add(itemField,1,2);
         pane.add(cost,0,3);
         pane.add(costField,1,3);
-        pane.add(confirmNumber,0,4);
-        pane.add(confirmField,1,4);
-        pane.add(shipCompany,0,5);
-        pane.add(companyField,1,5);
-        pane.add(shipCost,0,6);
-        pane.add(shipCostField,1,6);
+        pane.add(creditNum,0,4);
+        pane.add(creditNumField,1,4);
+        pane.add(creditName,0,5);
+        pane.add(creditNameField,1,5);
+        pane.add(confirmNumber,0,6);
+        pane.add(confirmField,1,6);
+        pane.add(shipCompany,0,7);
+        pane.add(companyField,1,7);
+        pane.add(shipCost,0,8);
+        pane.add(shipCostField,1,8);
 
         pane.setVgap(5);
         pane.setHgap(5);
@@ -55,6 +63,7 @@ public class OrdersPane implements DisplayInterface{
     public void displayOne(Order order){
 
         String temp = "";
+        int tempNum = 0;
 
         customerTxt.setText(order.getCustomer());
         addressField.setText(order.getShipping_Address());
@@ -63,6 +72,10 @@ public class OrdersPane implements DisplayInterface{
             temp += product.toString() + "\n";
         }
 
+        tempNum = order.getCreditNum()%10000;
+
+        creditNumField.setText("**** **** **** " + tempNum);
+        creditNameField.setText(order.getCreditName());
         itemField.setText(temp);
         costField.setText("" + order.getCost());
         confirmField.setText("" + order.getConfirmNumber());

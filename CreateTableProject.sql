@@ -25,16 +25,16 @@ DROP TABLE `Account`;
 DROP TABLE `Sold_At`;
 
 
-DROP TABLE `Items_sold`;
-
-
-DROP TABLE `Makes_Sale`;
+DROP TABLE `paid_with`;
 
 
 DROP TABLE `contains`;
 
 
 DROP TABLE `supplies`;
+
+
+DROP TABLE `owner_of`;
 
 
 DROP TABLE `Has`;
@@ -67,7 +67,7 @@ DROP TABLE `Events`;
 DROP TABLE `Warehouse`;
 
 
-DROP TABLE `Sale`;
+DROP TABLE `Receipt`;
 
 
 DROP TABLE `Vendor`;
@@ -83,6 +83,9 @@ DROP TABLE `Store`;
 
 
 DROP TABLE `Customer`;
+
+
+DROP TABLE `Credit_Card`;
 
 
 CREATE TABLE `Promotions`
@@ -146,7 +149,7 @@ PRIMARY KEY (`W_id`)
 );
 
 
-CREATE TABLE `Sale`
+CREATE TABLE `Receipt`
 (
  `S_id`       INT NOT NULL AUTO_INCREMENT,
  `Total_cost` DOUBLE NOT NULL ,
@@ -213,6 +216,14 @@ CREATE TABLE `Customer`
 PRIMARY KEY (`C_id`)
 );
 
+CREATE TABLE `Credit_Card`
+(
+ `Credit_id`    INT NOT NULL AUTO_INCREMENT,
+ `Name`   VARCHAR(45) NOT NULL ,
+ `Credit_num`   INT NOT NULL ,
+ 
+PRIMARY KEY (`Credit_id`)
+);
 
 CREATE TABLE `Account`
 (
@@ -227,32 +238,12 @@ CONSTRAINT `Account-SSN` FOREIGN KEY (`SSN`) REFERENCES `Employee` (`SSN`)
 
 CREATE TABLE `Sold_At`
 (
- `S_id`     INT NOT NULL ,
+ `o_id`     INT NOT NULL ,
  `Store_id` INT NOT NULL ,
 
-PRIMARY KEY (`S_id`, `Store_id`),
-CONSTRAINT `Sold_at-S_id` FOREIGN KEY (`S_id`) REFERENCES `Sale` (`S_id`),
+PRIMARY KEY (`o_id`, `Store_id`),
+CONSTRAINT `Sold_at-O_id` FOREIGN KEY (`o_id`) REFERENCES `Orders` (`o_id`),
 CONSTRAINT `Sold_at-Store_id` FOREIGN KEY (`Store_id`) REFERENCES `Store` (`Store_id`)
-);
-
-CREATE TABLE `Items_sold`
-(
- `P_id` INT NOT NULL ,
- `S_id` INT NOT NULL ,
-
-PRIMARY KEY (`P_id`, `S_id`),
-CONSTRAINT `Items_Sold-P_id` FOREIGN KEY (`P_id`) REFERENCES `Products` (`P_id`),
-CONSTRAINT `Items_Sold-S_id` FOREIGN KEY (`S_id`) REFERENCES `Sale` (`S_id`)
-);
-
-CREATE TABLE `Makes_Sale`
-(
- `C_id` INT NOT NULL ,
- `S_id` INT NOT NULL ,
-
-PRIMARY KEY (`C_id`, `S_id`),
-CONSTRAINT `Makes_Sale-C_id` FOREIGN KEY (`C_id`) REFERENCES `Customer` (`C_id`),
-CONSTRAINT `Makes_Sale-S_id` FOREIGN KEY (`S_id`) REFERENCES `Sale` (`S_id`)
 );
 
 CREATE TABLE `contains`
@@ -387,6 +378,18 @@ KEY `Take_Place-Store_id` (`Store_id`),
 CONSTRAINT `Take_Place-Store_id` FOREIGN KEY `Take_Place-Store_id` (`Store_id`) REFERENCES `Store` (`Store_id`),
 KEY `Take_Place-Event_id` (`Event_Id`),
 CONSTRAINT `Take_Place-Event_id` FOREIGN KEY `Take_Place-Event_id` (`Event_Id`) REFERENCES `Events` (`Event_Id`)
+);
+
+CREATE TABLE `Paid_with`
+(
+ `o_id` INT NOT NULL ,
+ `credit_Id` INT NOT NULL ,
+
+PRIMARY KEY (`o_id`, `credit_Id`),
+KEY `owner_of-o_id` (`o_id`),
+CONSTRAINT `Owner_of-o_id` FOREIGN KEY `Owner_of-o_id` (`o_id`) REFERENCES `Orders` (`o_id`),
+KEY `owner_of-Credit_id` (`credit_Id`),
+CONSTRAINT `Owner_of-credit_id` FOREIGN KEY `Owner_of-credit_id` (`credit_Id`) REFERENCES `Credit_Card` (`credit_Id`)
 );
 
 

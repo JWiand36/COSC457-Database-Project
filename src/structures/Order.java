@@ -11,6 +11,9 @@ public class Order implements DataInterface {
     private ArrayList<Product> products;
     private String shipping_Address;
     private Company company;
+    private int creditNum;
+    private String creditName;
+    private boolean credit;
 
     public Order(){
         this.id = 0;
@@ -20,9 +23,12 @@ public class Order implements DataInterface {
         this.products = new ArrayList<>();
         this.shipping_Address = "";
         this.company = new Company(0,"",0);
+        this.creditNum = 0;
+        this.creditName = "";
     }
 
-    public Order(int id, String customer, int confirmNumber, double cost, ArrayList<Product> products, String shipping_Address, Company company) {
+    public Order(int id, String customer, int confirmNumber, double cost, ArrayList<Product> products,
+                 String shipping_Address, Company company, int creditNum, String creditName) {
         this.id = id;
         this.customer = customer;
         this.confirmNumber = confirmNumber;
@@ -30,15 +36,20 @@ public class Order implements DataInterface {
         this.products = products;
         this.shipping_Address = shipping_Address;
         this.company = company;
+        this.creditName = creditName;
+        this.creditNum = creditNum;
     }
 
-    public Order(String customer, double cost, String shipping_Address, ArrayList<Product> products) {
+    public Order(String customer, double cost, String shipping_Address, ArrayList<Product> products, int creditNum, String creditName, boolean credit) {
         this.confirmNumber = confirmNumber;
         this.customer = customer;
         this.cost = cost;
         this.shipping_Address = shipping_Address;
         this.products = products;
         this.company = new Company(0,"",0);
+        this.creditNum = creditNum;
+        this.creditName = creditName;
+        this.credit = credit;
     }
 
     public String getCustomer() {
@@ -78,4 +89,10 @@ public class Order implements DataInterface {
     }
 
     public Company getCompany(){ return company; }
+
+    public int getCreditNum() { return creditNum; }
+
+    public String getCreditName(){ return creditName; }
+
+    public boolean getCredit(){ return credit; }
 }

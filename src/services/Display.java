@@ -7,7 +7,6 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import structures.DataInterface;
 import structures.Product;
-import structures.Receipt;
 
 /*
  This class controls anything dealing with the display. If an action takes place that involve
@@ -23,7 +22,6 @@ public class Display {
     private Customer customer;
     private Employee employee;
     private Inventory inventory;
-    private Sale sale;
     private EventPane eventPane;
     private OrdersPane ordersPane;
     private PromotionalPane promoPane;
@@ -33,7 +31,6 @@ public class Display {
     private AddCustomer add_customer;
     private AddProduct add_product;
     private AddEmployee add_employee;
-    private AddSale add_sale;
     private AddEvent add_event;
     private AddOrder add_order;
     private AddPromotion add_promo;
@@ -51,10 +48,8 @@ public class Display {
 
     //Used to help determine location
     public static final int CUSTOMERS = 1;
-    public static final int SALES = 2;
     public static final int INVENTORY = 3;
     public static final int EMPLOYEE = 4;
-    static final int ADD_SALE = 5;
     public static final int WARHOUSE = 6;
     public static final int VENDOR = 7;
     public static final int EVENT = 8;
@@ -75,7 +70,6 @@ public class Display {
         this.customer = new Customer();
         this.employee = new Employee();
         this.inventory = new Inventory();
-        this.sale = new Sale();
         this.eventPane = new EventPane();
         this.promoPane = new PromotionalPane();
         this.ordersPane = new OrdersPane();
@@ -84,7 +78,6 @@ public class Display {
         this.add_customer = new AddCustomer(controller);
         this.add_employee = new AddEmployee(controller);
         this.add_product = new AddProduct(controller, this);
-        this.add_sale = new AddSale(controller);
         this.add_event = new AddEvent(controller);
         this.add_promo = new AddPromotion(controller);
         this.add_order = new AddOrder(controller);
@@ -108,11 +101,11 @@ public class Display {
     public void displayNav(){
         side.getStores(controller.getStores());
 
-        this.current_pane = SALES;
+        this.current_pane = ADDORDER;
         setInfo();
 
         main.setTop(nav.displayNav(controller.isManager()));
-        main.setCenter(sale.display());
+        main.setCenter(add_order.display());
         main.setRight(side.display());
 
     }
@@ -155,9 +148,6 @@ public class Display {
             case "Customer":
                 item.setOnMouseClicked(e-> this.display(customer, add_customer, CUSTOMERS));
                 break;
-            case "Previous Sales":
-                item.setOnMouseClicked(e-> this.display(sale, null, SALES));
-                break;
             case "Inventory":
                 item.setOnMouseClicked(e-> this.display(inventory, add_product, INVENTORY));
                 break;
@@ -167,17 +157,14 @@ public class Display {
             case "Events":
                 item.setOnMouseClicked(e-> this.display(eventPane, add_event, EVENT));
                 break;
-            case "Orders":
+            case "Sale":
                 item.setOnMouseClicked(e-> this.display(ordersPane, null, ORDER));
                 break;
-            case "Make Order":
+            case "Make Sale":
                 item.setOnMouseClicked(e-> this.display(add_order, null, ADDORDER));
                 break;
             case "Promotions":
                 item.setOnMouseClicked(e-> this.display(promoPane, add_promo, PROMOTION));
-                break;
-            case "New Sale":
-                item.setOnMouseClicked(e-> this.display(add_sale, null, ADD_SALE));
                 break;
             case "Shipment":
                 item.setOnMouseClicked(e-> this.display(shipmentPane, add_shipment, SHIPMENT));
@@ -196,8 +183,6 @@ public class Display {
         if(current_pane == CUSTOMERS){
             customer.displayOne((structures.Customer) obj);
             add_customer.displayOne((structures.Customer) obj);
-        }else if(current_pane == SALES){
-            sale.displayOne((Receipt) obj);
         }else if(current_pane == INVENTORY){
             inventory.displayOne((Product) obj);
             add_product.displayOne((Product) obj);
@@ -206,8 +191,6 @@ public class Display {
         }else if(current_pane == EMPLOYEE){
             employee.displayOne((structures.Employee) obj);
             add_employee.displayOne((structures.Employee) obj);
-        }else if(current_pane == ADD_SALE){
-            add_sale.displayOne((structures.Product) obj);
         }else if(current_pane == EVENT){
             eventPane.displayOne((structures.Event) obj);
             add_event.displayOne((structures.Event) obj);

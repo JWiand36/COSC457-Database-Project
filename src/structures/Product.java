@@ -67,4 +67,13 @@ public class Product implements DataInterface{
     public String toString(){
         return this.name + ": $" + this.price;
     }
+
+    public void addDiscount(double discount){
+        if(price > discount){
+            price -= discount;
+            price = (double) Math.round(price * 100) / 100;
+        }
+
+        name += "*";
+    }
 }

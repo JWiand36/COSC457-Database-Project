@@ -72,14 +72,10 @@ public class Storage {
 
         if(location == CUSTOMERS){
             return getCustomer(data);
-        }else if(location == SALES){
-            return getReceipt(data);
         }else if(location == INVENTORY){
             return getProduct(data);
         }else if(location == EMPLOYEE){
             return getEmployee(data);
-        }else if(location == ADD_SALE){
-            return getProduct(data);
         }else if(location == EVENT) {
             return getEvent(data);
         }else if(location == PROMOTION){
@@ -98,8 +94,6 @@ public class Storage {
 
         if(current_pane == CUSTOMERS){
             addCustomer((Customer) data);
-        }else if(current_pane == SALES){
-            addSale((Receipt) data);
         }else if(current_pane == INVENTORY){
             addProduct((Product) data);
         }else if(current_pane == EMPLOYEE){
@@ -159,13 +153,6 @@ public class Storage {
                             "from shop_at, store " +
                             "where shop_at.store_id = store.store_id " +
                             "and store.location = \""+ store_location +"\");");
-            } else if (n == SALES) {
-                resultSet = statement.executeQuery("select S_id from sale " +
-                        "where sale.s_id in " +
-                            "(select s_id " +
-                            "from sold_at, store " +
-                            "where sold_at.store_id = store.store_id " +
-                            "and store.location = \""+ store_location +"\");");
             } else if (n == INVENTORY) {
                 resultSet = statement.executeQuery("select Name from products " +
                         "where products.p_id in " +
@@ -179,13 +166,6 @@ public class Storage {
                         "where works_at.store_id = store.store_id " +
                         "and works_at.ssn = employee.ssn " +
                         "and store.location = \""+ store_location +"\";");
-            } else if (n == ADD_SALE) {
-                resultSet = statement.executeQuery("select Name from products " +
-                        "where products.p_id in " +
-                        "(select p_id " +
-                        "from has, store " +
-                        "where has.store_id = store.store_id " +
-                        "and store.location = \""+ store_location +"\");");
             } else if (n == EVENT){
                 resultSet = statement.executeQuery("select concat_ws(' ',events.event_id, events.name) as name from events " +
                         "where events.event_id in " +
@@ -199,15 +179,21 @@ public class Storage {
                         "where products.P_id = promoted.P_id " +
                         "and promotions.promo_id = promoted.promo_id;");
             } else if (n == SHIPMENT){
-                resultSet = statement.executeQuery("select concat_ws(' ',orders.o_id, shipment.shipping_address) as name " +
-                        "from orders, shipment, ship " +
-                        "where orders.o_id = ship.o_id " +
-                        "and shipment.shipment_id = ship.shipment_id;");
+                resultSet = statement.executeQuery("select concat_ws(' ',orders.o_id, concat_ws(' ', customer.fname, customer.lname)) as name " +
+                        "from orders, customer, ordered, store, sold_at " +
+                        "where orders.o_id = ordered.o_id " +
+                        "and customer.c_id = ordered.c_id " +
+                        "and orders.o_id = sold_at.o_id " +
+                        "and store.store_id = sold_at.store_id " +
+                        "and store.location = \""+store_location+"\";");
             }else if (n == ORDER){
-                resultSet = statement.executeQuery("select concat_ws(' ',orders.o_id, shipment.shipping_address) as name " +
-                        "from orders, shipment, ship " +
-                        "where orders.o_id = ship.o_id " +
-                        "and shipment.shipment_id = ship.shipment_id;");
+                resultSet = statement.executeQuery("select concat_ws(' ',orders.o_id, concat_ws(' ', customer.fname, customer.lname)) as name " +
+                        "from orders, customer, ordered, store, sold_at " +
+                        "where orders.o_id = ordered.o_id " +
+                        "and customer.c_id = ordered.c_id " +
+                        "and orders.o_id = sold_at.o_id " +
+                        "and store.store_id = sold_at.store_id " +
+                        "and store.location = \""+store_location+"\";");
             } else if (n == ADDORDER) {
                 resultSet = statement.executeQuery("select Name from products " +
                         "where products.p_id in " +
@@ -309,62 +295,6 @@ public class Storage {
         return customer;
     }
 
-    private DataInterface getReceipt(String data){
-
-        Receipt receipt;
-        ArrayList<Product> products = new ArrayList<>();
-
-        try {
-            resultSet = statement.executeQuery("select s.s_id, s.total_cost, s.date, " +
-                    "store.location " +
-                    "from sale as s, " +
-                    "store inner join sold_at on sold_at.store_id = store.store_id " +
-                    "where sold_at.s_id = s.s_id " +
-                    "and s.s_id = \"" + data + "\";");
-
-            resultSet.next();
-            int id = resultSet.getInt(1);
-            double cost = resultSet.getDouble(2);
-            String date = resultSet.getString(3);
-            String store = resultSet.getString(4);
-
-
-            String customerName = "";
-
-
-            resultSet = statement.executeQuery("select concat_ws(' ', customer.fname,customer.lname) " +
-                    "from sale, customer inner join makes_sale on makes_sale.c_id = customer.c_id " +
-                    "where makes_sale.s_id = sale.s_id " +
-                    "and sale.s_id = \""+data+"\";");
-
-            if(resultSet.next())
-                customerName = resultSet.getString(1);
-
-
-            resultSet = statement.executeQuery("select products.p_id, products.name, products.description, products.amt_left, products.price " +
-                    "from items_sold as p inner join products on p.P_id = products.P_id, sale " +
-                    "where sale.s_id = p.s_id " +
-                    "and sale.s_id = \""+data+"\";");
-
-            while(resultSet.next()){
-                int p_id = resultSet.getInt(1);
-                String p_name = resultSet.getString(2);
-                String p_descrip = resultSet.getString(3);
-                int amt_left = resultSet.getInt(4);
-                double price = resultSet.getDouble(5);
-                products.add(new Product(p_id, p_name, p_descrip, amt_left, price));
-            }
-
-            receipt = new Receipt(id, customerName, store, cost, products, date);
-
-        }catch (SQLException ex ){
-            ex.printStackTrace();
-            receipt = new Receipt();
-        }
-
-        return receipt;
-    }
-
     private Product getProduct(String data){
 
         Product product;
@@ -381,6 +311,14 @@ public class Storage {
             double price = resultSet.getDouble(5);
 
             product = new Product(id, name, description, amt, price);
+
+            resultSet = statement.executeQuery("select discount from promotions, promoted " +
+                    "where promoted.p_id = "+id+" " +
+                    "and promoted.promo_id = promotions.promo_id;");
+
+            while(resultSet.next()){
+                product.addDiscount(resultSet.getDouble(1));
+            }
 
         }catch (SQLException e){
             e.printStackTrace();
@@ -495,10 +433,12 @@ public class Storage {
             String address = "";
             double cost = 0;
             double shippingCost = 0;
+            String creditName = "";
+            int creditNum = 0;
 
             resultSet = statement.executeQuery("select orders.o_id, shipment.shipping_address, invoice.cost, concat_ws(' ', customer.fname, customer.lname) " +
                     "from orders, invoice, shipment, processed, ship, customer, ordered " +
-                    "where concat_ws(' ', orders.o_id, shipment.shipping_address) = \"" + data + "\" " +
+                    "where concat_ws(' ', orders.o_id, concat_ws(' ', customer.fname, customer.lname)) = \"" + data + "\" " +
                     "and orders.o_id = ship.o_id " +
                     "and shipment.shipment_id = ship.shipment_id " +
                     "and orders.o_id = processed.O_id " +
@@ -548,7 +488,14 @@ public class Storage {
                 products.add(new Product(pId, pName, pDescription, pAmt, pPrice));
             }
 
-            order = new Order(id, customer, confirmNum, cost, products, address, company);
+            resultSet = statement.executeQuery("select credit_num, credit_card.Name from credit_card, paid_with, orders " +
+                    "where orders.o_id = \""+id+"\" and orders.o_id = paid_with.o_id " +
+                    "and credit_card.credit_id = paid_with.credit_id");
+            resultSet.next();
+            creditNum = resultSet.getInt(1);
+            creditName = resultSet.getString(2);
+
+            order = new Order(id, customer, confirmNum, cost, products, address, company, creditNum, creditName);
 
         }catch (SQLException ex){
             ex.printStackTrace();
@@ -561,6 +508,8 @@ public class Storage {
     private void addCustomer(Customer customer){
 
         try{
+            double balance;
+
             resultSet = statement.executeQuery("select c_id from customer where concat_ws(' ', fname, lname) = " +
                     "'"+customer.getFirst_name()+" "+customer.getLast_name()+"'");
 
@@ -589,6 +538,23 @@ public class Storage {
                     preparedStatement.setString(1, id+"");
                     preparedStatement.executeUpdate();
                 }
+
+                if(customer.getPay() > 0){
+                    resultSet = statement.executeQuery("select balance from customer where c_id = "+id+";");
+                    resultSet.next();
+
+                    balance = resultSet.getDouble(1);
+                    if(balance > customer.getPay()) {
+                        balance -= customer.getPay();
+                    }else
+                        balance = 0;
+
+                    preparedStatement = connection.prepareStatement("update customer " +
+                            "set balance = " + balance +" " +
+                            "where c_id = "+id+";");
+                    preparedStatement.executeUpdate();
+                }
+
             }else{
 
                 preparedStatement = connection.prepareStatement("insert into customer(fname, " +
@@ -610,57 +576,6 @@ public class Storage {
             }
 
         }catch (SQLException ex){ ex.printStackTrace(); }
-    }
-
-    private void addSale(Receipt receipt){
-
-//    public Receipt(String customer_name, String store_location, ArrayList<Product> products, String date) {
-
-        try{
-
-            preparedStatement = connection.prepareStatement("insert into sale(total_cost, date) " +
-                    "values(?,?)");
-            preparedStatement.setDouble(1,receipt.getTotal_balance());
-            preparedStatement.setString(2,receipt.getDate());
-            preparedStatement.executeUpdate();
-
-
-            resultSet = statement.executeQuery("select s_id from sale where date = '"+receipt.getDate()+"';");
-            resultSet.next();
-            int id = resultSet.getInt(1);
-
-            preparedStatement = connection.prepareStatement("insert into sold_at (s_id, store_id) " +
-                    "values (?,?)");
-            preparedStatement.setInt(1,id);
-            preparedStatement.setInt(2,store_id);
-            preparedStatement.executeUpdate();
-
-            resultSet = statement.executeQuery("select c_id " +
-                    "from customer " +
-                    "where concat_ws(' ', fname, lname) = '" +receipt.getCustomer_name()+"'");
-            if(resultSet.next()){
-                int cid = resultSet.getInt(1);
-
-                preparedStatement = connection.prepareStatement("insert into makes_sale(c_id, s_id) " +
-                        "values (?,?)");
-                preparedStatement.setInt(1,cid);
-                preparedStatement.setInt(2,id);
-                preparedStatement.executeUpdate();
-            }
-
-            for(Product product: receipt.getProducts()){
-
-                preparedStatement = connection.prepareStatement("insert into items_sold(p_id, s_id) " +
-                        "values(?,?);");
-                preparedStatement.setInt(1,product.getId());
-                preparedStatement.setInt(2,id);
-                preparedStatement.executeUpdate();
-
-                subAmt(1,product);
-            }
-
-        }catch (SQLException ex){ex.printStackTrace();}
-
     }
 
     private void addProduct(Product product){
@@ -787,10 +702,15 @@ public class Storage {
     void subAmt(int amount, Product product){
 
         try {
-            preparedStatement = connection.prepareStatement("update products " +
-                    "set amt_left = amt_left - "+amount+" " +
-                    "where name = '"+product.getName()+"';" );
-            preparedStatement.executeUpdate();
+            resultSet = statement.executeQuery("select amt_left from products where name = \""+product.getName()+"\";");
+            resultSet.next();
+
+            if(resultSet.getInt(1) > amount) {
+                preparedStatement = connection.prepareStatement("update products " +
+                        "set amt_left = amt_left - " + amount + " " +
+                        "where name = '" + product.getName() + "';");
+                preparedStatement.executeUpdate();
+            }
         }catch (SQLException ex){ex.printStackTrace();}
     }
 
@@ -905,6 +825,8 @@ public class Storage {
         int invoiceId = 0;
         int customerId = 0;
         int shipmentId = 0;
+        int creditId = 0;
+        double balance = 0;
 
         try {
 
@@ -915,6 +837,11 @@ public class Storage {
             resultSet.next();
 
             id = resultSet.getInt(1);
+
+            preparedStatement = connection.prepareStatement("insert into sold_at(o_id, store_id) values(?,?)");
+            preparedStatement.setInt(1,id);
+            preparedStatement.setInt(2,store_id);
+            preparedStatement.executeUpdate();
 
             preparedStatement = connection.prepareStatement("insert into invoice(cost) values (?)");
             preparedStatement.setDouble(1, order.getCost());
@@ -971,14 +898,42 @@ public class Storage {
             preparedStatement.setInt(2, id);
             preparedStatement.executeUpdate();
 
+            if(order.getCreditNum() != 0){
+                preparedStatement = connection.prepareStatement("insert into credit_card(credit_num, name) " +
+                        "values(?,?);");
+                preparedStatement.setInt(1, order.getCreditNum());
+                preparedStatement.setString(2, order.getCreditName());
+                preparedStatement.executeUpdate();
+
+                resultSet = statement.executeQuery("select credit_id from credit_card where credit_num = "+order.getCreditNum()+";");
+                resultSet.next();
+
+                creditId = resultSet.getInt(1);
+
+                preparedStatement = connection.prepareStatement("insert into paid_with(credit_id, o_id) values (?,?)");
+                preparedStatement.setInt(1, creditId);
+                preparedStatement.setInt(2, id);
+                preparedStatement.executeUpdate();
+            }
+
+            if(order.getCredit()){
+                resultSet = statement.executeQuery("select balance from customer where c_id = "+customerId+";");
+                resultSet.next();
+
+                balance = resultSet.getDouble(1);
+                balance += order.getCost();
+
+                preparedStatement = connection.prepareStatement("update customer " +
+                        "set balance = " + balance +" " +
+                        "where c_id = "+customerId+";");
+                preparedStatement.executeUpdate();
+            }
+
         }catch (SQLException ex){ ex.printStackTrace(); }
 
     }
 
     private void editOrder(Order order){
-
-        System.out.println();
-
         try {
             int shipmentId;
             int confirm = 0;
